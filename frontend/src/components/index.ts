@@ -18,3 +18,6 @@ export { default as FileExplorer } from './FileExplorer';
 export type { FileNode } from './FileExplorer';
 export { default as FileTabs } from './FileTabs';
 export { default as CodeEditorPage } from './CodeEditorPage';
+export { ThemeToggle } from './ThemeToggle';
+export { UserPreferencesPanel } from './UserPreferencesPanel';
+export { OnboardingTour, useOnboarding } from './OnboardingTour';

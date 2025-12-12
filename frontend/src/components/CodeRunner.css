@@ -1,0 +1,327 @@
+.code-runner {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    height: 100%;
+}
+
+.runner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    user-select: none;
+}
+
+.runner-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.runner-icon {
+    font-size: 14px;
+}
+
+.runner-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.file-info {
+    color: var(--text-secondary);
+    font-size: 12px;
+    background: var(--bg-primary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.runner-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.unsupported-notice {
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-style: italic;
+}
+
+.runner-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.runner-btn:hover:not(:disabled) {
+    background: var(--accent-color-hover);
+    transform: translateY(-1px);
+}
+
+.runner-btn:disabled {
+    background: var(--text-tertiary);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.run-btn {
+    background: #28a745;
+}
+
+.run-btn:hover:not(:disabled) {
+    background: #218838;
+}
+
+.stop-btn {
+    background: #dc3545;
+}
+
+.stop-btn:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.execution-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(40, 167, 69, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    color: #28a745;
+}
+
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.execution-result {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.result-status {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.result-status.success {
+    color: #28a745;
+}
+
+.result-status.error {
+    color: #dc3545;
+}
+
+.execution-time {
+    color: var(--text-secondary);
+    font-size: 11px;
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.result-section-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.result-errors {
+    margin-bottom: 12px;
+}
+
+.error-message {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    border-left: 3px solid #dc3545;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.result-output {
+    margin-bottom: 12px;
+}
+
+.output-line {
+    background: var(--bg-tertiary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    border-left: 3px solid #28a745;
+}
+
+.no-output {
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+}
+
+.execution-history {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+.clear-history-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.clear-history-btn:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    font-size: 11px;
+    transition: background 0.2s ease;
+}
+
+.history-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.history-status {
+    font-size: 10px;
+    min-width: 16px;
+}
+
+.history-time {
+    color: var(--text-secondary);
+    min-width: 50px;
+}
+
+.history-summary {
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+/* Scrollbar styling */
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .code-runner {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --text-primary: #cccccc;
+    --text-secondary: #969696;
+    --text-tertiary: #6a6a6a;
+    --border-color: #3e3e42;
+    --accent-color: #007acc;
+    --accent-color-hover: #005a9e;
+}
+
+[data-theme="dark"] .execution-status {
+    background: rgba(40, 167, 69, 0.15);
+}
+
+[data-theme="dark"] .error-message {
+    background: rgba(220, 53, 69, 0.15);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .code-runner {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-tertiary: #adb5bd;
+    --border-color: #dee2e6;
+    --accent-color: #007bff;
+    --accent-color-hover: #0056b3;
+}

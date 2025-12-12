@@ -628,3 +628,106 @@
         align-items: flex-start;
     }
 }
+
+/* New header buttons for preferences and help */
+.preferences-btn,
+.help-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-secondary, #f8f9fa);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-primary, #2d3748);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.preferences-btn:hover,
+.help-btn:hover {
+    background: var(--bg-hover, #e2e8f0);
+    border-color: var(--primary-300, #93c5fd);
+    transform: translateY(-1px);
+}
+
+.preferences-btn:focus,
+.help-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-500, #3b82f6);
+}
+
+/* Dark theme styles for new buttons */
+[data-theme="dark"] .preferences-btn,
+[data-theme="dark"] .help-btn {
+    background: var(--bg-secondary-dark, #374151);
+    border-color: var(--border-color-dark, #4b5563);
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .preferences-btn:hover,
+[data-theme="dark"] .help-btn:hover {
+    background: var(--bg-hover-dark, #4b5563);
+    border-color: var(--primary-400, #60a5fa);
+}
+
+/* Performance optimization indicators */
+.performance-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--bg-primary, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    color: var(--text-secondary, #6b7280);
+    z-index: 100;
+}
+
+.performance-indicator.hidden {
+    display: none;
+}
+
+/* CSS Variables for theme support */
+:root {
+    --editor-font-family: 'Monaco, Menlo, Ubuntu Mono', monospace;
+    --editor-font-size: 14px;
+}
+
+/* Auto theme detection */
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+        --bg-primary: #1f2937;
+        --bg-secondary: #374151;
+        --bg-hover: #4b5563;
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --border-color: #4b5563;
+    }
+}
+
+/* Responsive adjustments for new elements */
+@media (max-width: 768px) {
+    .header-nav {
+        gap: 8px;
+    }
+
+    .preferences-btn,
+    .help-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .performance-indicator {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px;
+        font-size: 11px;
+    }
+}

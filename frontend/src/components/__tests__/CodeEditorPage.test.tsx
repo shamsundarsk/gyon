@@ -2,6 +2,61 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CodeEditorPage from '../CodeEditorPage';
 
+// Mock the useFileManager hook
+vi.mock('../../hooks/useFileManager', () => ({
+  useFileManager: () => ({
+    projects: [],
+    activeProject: {
+      id: 'test-project',
+      name: 'Test Project',
+      description: 'A test project',
+      files: [
+        {
+          id: 'src',
+          name: 'src',
+          type: 'folder',
+          path: 'src',
+          children: [
+            {
+              id: 'index-js',
+              name: 'index.js',
+              type: 'file',
+              path: 'src/index.js',
+              content: 'console.log("Hello World");'
+            }
+          ]
+        },
+        {
+          id: 'package-json',
+          name: 'package.json',
+          type: 'file',
+          path: 'package.json',
+          content: '{"name": "test-project", "version": "1.0.0"}'
+        },
+        {
+          id: 'readme-md',
+          name: 'README.md',
+          type: 'file',
+          path: 'README.md',
+          content: '# Test Project\n\nA test project for the AI Code Editor.'
+        }
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    isLoading: false,
+    error: null,
+    createProject: vi.fn(),
+    loadProject: vi.fn(),
+    deleteProject: vi.fn(),
+    createFile: vi.fn(),
+    createFolder: vi.fn(),
+    updateFile: vi.fn(),
+    deleteFile: vi.fn(),
+    clearError: vi.fn()
+  })
+}));
+
 // Mock all the child components
 vi.mock('../CodeEditor', () => ({
   default: ({ file }: any) => (
@@ -53,6 +108,51 @@ vi.mock('../FileTabs', () => ({
       {activeFile && <div>Active: {activeFile.name}</div>}
     </div>
   )
+}));
+
+vi.mock('../ProjectSwitcher', () => ({
+  default: () => <div data-testid="project-switcher">Project Switcher</div>
+}));
+
+vi.mock('../ProjectTemplateSelector', () => ({
+  default: () => <div data-testid="project-template-selector">Template Selector</div>
+}));
+
+vi.mock('../Console', () => ({
+  default: () => <div data-testid="console">Console</div>
+}));
+
+vi.mock('../CodeRunner', () => ({
+  default: () => <div data-testid="code-runner">Code Runner</div>
+}));
+
+vi.mock('../LivePreview', () => ({
+  default: () => <div data-testid="live-preview">Live Preview</div>
+}));
+
+vi.mock('../ProjectGallery', () => ({
+  default: () => <div data-testid="project-gallery">Project Gallery</div>
+}));
+
+vi.mock('../ProjectSharingDialog', () => ({
+  default: () => <div data-testid="project-sharing-dialog">Sharing Dialog</div>
+}));
+
+
+
+// Mock services
+vi.mock('../../services/ProjectImportService', () => ({
+  projectImportService: {
+    importMashupProject: vi.fn()
+  }
+}));
+
+vi.mock('../../services/ProjectExportService', () => ({
+  ProjectExportService: {
+    getInstance: () => ({
+      exportProject: vi.fn()
+    })
+  }
 }));
 
 describe('CodeEditorPage Component', () => {

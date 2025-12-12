@@ -1,0 +1,231 @@
+.console {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    height: 100%;
+    min-height: 200px;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    user-select: none;
+}
+
+.console-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.console-icon {
+    font-size: 14px;
+}
+
+.message-count {
+    background: var(--accent-color);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.console-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.console-btn {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.console-btn:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--accent-color);
+}
+
+.console-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.clear-btn:hover:not(:disabled) {
+    background: #fee;
+    border-color: #f56565;
+    color: #f56565;
+}
+
+.console-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.console-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.6;
+}
+
+.console-empty p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.console-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.console-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 12px;
+    border-left: 3px solid transparent;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.console-message:hover {
+    background: var(--bg-tertiary);
+}
+
+.message-timestamp {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    min-width: 60px;
+    font-weight: 500;
+}
+
+.message-icon {
+    font-size: 12px;
+    min-width: 16px;
+}
+
+.message-text {
+    flex: 1;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+/* Message type styles */
+.console-log {
+    border-left-color: #4a90e2;
+}
+
+.console-log .message-text {
+    color: var(--text-primary);
+}
+
+.console-error {
+    border-left-color: #f56565;
+    background: rgba(245, 101, 101, 0.05);
+}
+
+.console-error .message-text {
+    color: #f56565;
+}
+
+.console-warn {
+    border-left-color: #ed8936;
+    background: rgba(237, 137, 54, 0.05);
+}
+
+.console-warn .message-text {
+    color: #ed8936;
+}
+
+.console-info {
+    border-left-color: #38b2ac;
+}
+
+.console-info .message-text {
+    color: #38b2ac;
+}
+
+/* Scrollbar styling */
+.console-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.console-messages::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.console-messages::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.console-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .console {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --text-primary: #cccccc;
+    --text-secondary: #969696;
+    --text-tertiary: #6a6a6a;
+    --border-color: #3e3e42;
+    --accent-color: #007acc;
+}
+
+[data-theme="dark"] .console-error {
+    background: rgba(245, 101, 101, 0.1);
+}
+
+[data-theme="dark"] .console-warn {
+    background: rgba(237, 137, 54, 0.1);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .console {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-tertiary: #adb5bd;
+    --border-color: #dee2e6;
+    --accent-color: #007bff;
+}

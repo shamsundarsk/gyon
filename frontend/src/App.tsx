@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import {
   LoadingSpinner,
@@ -9,8 +9,13 @@ import { FAQ } from './components/FAQ';
 import { AIChatbot } from './components/AIChatbot';
 import { GenerationPage } from './components/GenerationPage';
 import { OllamaStatus } from './components/OllamaStatus';
+import { ThemeToggle } from './components/ThemeToggle';
+import { UserPreferencesPanel } from './components/UserPreferencesPanel';
+import { OnboardingTour, useOnboarding } from './components/OnboardingTour';
 import { DiceIcon, LightbulbIcon, CompassIcon, RocketIcon, AlertIcon, RobotIcon } from './components/Icons';
 import { useMashup } from './context';
+import { performanceOptimizer } from './services/PerformanceOptimizer';
+import { userPreferencesService } from './services/UserPreferencesService';
 
 function App() {
   const { 
@@ -26,9 +31,34 @@ function App() {
     generateCustom
   } = useMashup();
   
+  const { hasSeenOnboarding, markOnboardingComplete } = useOnboarding();
+  
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(!hasSeenOnboarding);
   const [currentPage, setCurrentPage] = useState<'landing' | 'generate' | 'results' | 'editor'>('landing');
+
+  // Initialize performance optimization
+  useEffect(() => {
+    performanceOptimizer.optimizeBundleLoading();
+    performanceOptimizer.optimizeAssets();
+    performanceOptimizer.implementCaching();
+
+    return () => {
+      performanceOptimizer.cleanup();
+    };
+  }, []);
+
+  // Apply user preferences on mount
+  useEffect(() => {
+    const preferences = userPreferencesService.getPreferences();
+    document.documentElement.setAttribute('data-theme', userPreferencesService.getEffectiveTheme());
+    
+    // Apply font preferences
+    document.documentElement.style.setProperty('--editor-font-family', preferences.fontFamily);
+    document.documentElement.style.setProperty('--editor-font-size', `${preferences.fontSize}px`);
+  }, []);
 
   const handleGenerate = (problemStatement?: string) => {
     generate(problemStatement);
@@ -64,6 +94,15 @@ function App() {
     regenerate();
   };
 
+  const handleOnboardingComplete = () => {
+    markOnboardingComplete();
+    setIsOnboardingOpen(false);
+  };
+
+  const handleShowOnboarding = () => {
+    setIsOnboardingOpen(true);
+  };
+
   const scrollToFeatures = (e: React.MouseEvent) => {
     e.preventDefault();
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
@@ -95,6 +134,21 @@ function App() {
             </div>
             <div className="header-nav">
               <OllamaStatus />
+              <ThemeToggle />
+              <button 
+                className="preferences-btn"
+                onClick={() => setIsPreferencesOpen(true)}
+                title="User Preferences"
+              >
+                ⚙️
+              </button>
+              <button 
+                className="help-btn"
+                onClick={handleShowOnboarding}
+                title="Show Help Tour"
+              >
+                ❓
+              </button>
               <button 
                 className="faq-btn"
                 onClick={() => setIsChatbotOpen(true)}
@@ -144,6 +198,17 @@ function App() {
           onClose={() => setIsFAQOpen(false)} 
         />
 
+        <UserPreferencesPanel
+          isOpen={isPreferencesOpen}
+          onClose={() => setIsPreferencesOpen(false)}
+        />
+
+        <OnboardingTour
+          isOpen={isOnboardingOpen}
+          onClose={() => setIsOnboardingOpen(false)}
+          onComplete={handleOnboardingComplete}
+        />
+
         {!isChatbotOpen && (
           <button 
             className="faq-fab"
@@ -175,6 +240,17 @@ function App() {
         <FAQ 
           isOpen={isFAQOpen} 
           onClose={() => setIsFAQOpen(false)} 
+        />
+
+        <UserPreferencesPanel
+          isOpen={isPreferencesOpen}
+          onClose={() => setIsPreferencesOpen(false)}
+        />
+
+        <OnboardingTour
+          isOpen={isOnboardingOpen}
+          onClose={() => setIsOnboardingOpen(false)}
+          onComplete={handleOnboardingComplete}
         />
 
         {!isChatbotOpen && (

@@ -1,0 +1,318 @@
+.progress-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 400px;
+    max-width: 90vw;
+    background: var(--bg-primary, #ffffff);
+    border: 1px solid var(--border-color, #e1e5e9);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+}
+
+.progress-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.progress-icon {
+    font-size: 18px;
+}
+
+.progress-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.cancel-button,
+.close-button {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary, #666);
+    transition: all 0.2s ease;
+}
+
+.cancel-button:hover,
+.close-button:hover {
+    background: var(--bg-secondary, #f5f5f5);
+    color: var(--text-primary, #1a1a1a);
+}
+
+.cancel-button:disabled,
+.close-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.progress-overall {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-secondary, #f5f5f5);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 14px;
+    color: var(--text-secondary, #666);
+}
+
+.active-step-info {
+    padding: 16px;
+    background: var(--bg-accent, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+}
+
+.active-step-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--text-primary, #1a1a1a);
+    margin-bottom: 8px;
+}
+
+.step-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.step-progress-bar-container {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-secondary, #f5f5f5);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.step-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3, #1976D2);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.step-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    min-width: 35px;
+}
+
+.step-message {
+    font-size: 14px;
+    color: var(--text-secondary, #666);
+    font-style: italic;
+}
+
+.progress-steps {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.progress-step {
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+}
+
+.progress-step:last-child {
+    border-bottom: none;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.step-header:hover {
+    background: var(--bg-secondary, #f5f5f5);
+}
+
+.step-icon {
+    font-size: 16px;
+    min-width: 20px;
+}
+
+.step-label {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.step-progress-inline {
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+}
+
+.step-expand-button {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+}
+
+.step-details {
+    padding: 0 16px 12px 44px;
+    border-top: 1px solid var(--border-color, #e1e5e9);
+    background: var(--bg-accent, #f8f9fa);
+}
+
+.step-message-detail {
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+    line-height: 1.4;
+    margin-top: 8px;
+}
+
+/* Step status styles */
+.progress-step.pending .step-icon {
+    opacity: 0.5;
+}
+
+.progress-step.active .step-label {
+    font-weight: 500;
+    color: var(--color-primary, #2196F3);
+}
+
+.progress-step.completed .step-label {
+    color: var(--color-success, #4CAF50);
+}
+
+.progress-step.error .step-label {
+    color: var(--color-error, #f44336);
+}
+
+.progress-error,
+.progress-success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.progress-error {
+    background: #fff3e0;
+    color: #e65100;
+    border-top: 1px solid #ffcc02;
+}
+
+.progress-success {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border-top: 1px solid #4caf50;
+}
+
+.error-icon,
+.success-icon {
+    font-size: 16px;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .progress-indicator {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --bg-accent: #252525;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --border-color: #404040;
+    --color-primary: #64b5f6;
+    --color-success: #81c784;
+    --color-error: #e57373;
+}
+
+[data-theme="dark"] .progress-error {
+    background: #2d1b00;
+    color: #ffb74d;
+    border-top-color: #ff9800;
+}
+
+[data-theme="dark"] .progress-success {
+    background: #1b2d1b;
+    color: #a5d6a7;
+    border-top-color: #66bb6a;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .progress-indicator {
+        width: 350px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-indicator {
+        width: calc(100vw - 20px);
+        right: 10px;
+        left: 10px;
+    }
+
+    .progress-header {
+        padding: 12px;
+    }
+
+    .progress-overall,
+    .active-step-info {
+        padding: 12px;
+    }
+
+    .step-header {
+        padding: 10px 12px;
+    }
+}

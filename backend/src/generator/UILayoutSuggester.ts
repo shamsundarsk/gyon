@@ -195,19 +195,23 @@ export class UILayoutSuggester {
     };
 
     // Get suggestions for this API's category, or use generic suggestions
-    const categorySuggestions = categoryToComponentType[api.category.toLowerCase()] || [
+    const categoryKey = api.category?.toLowerCase() || 'default';
+    const categorySuggestions = categoryToComponentType[categoryKey] || [
       { type: 'card' as const, purpose: `Display ${api.name} data` },
       { type: 'list' as const, purpose: `List ${api.name} items` },
       { type: 'form' as const, purpose: `Input parameters for ${api.name}` },
     ];
 
-    categorySuggestions.forEach((suggestion) => {
-      suggestions.push({
-        type: suggestion.type,
-        purpose: suggestion.purpose,
-        apiSource: api.name,
+    // Ensure categorySuggestions is always an array
+    if (Array.isArray(categorySuggestions)) {
+      categorySuggestions.forEach((suggestion) => {
+        suggestions.push({
+          type: suggestion.type,
+          purpose: suggestion.purpose,
+          apiSource: api.name,
+        });
       });
-    });
+    }
 
     return suggestions;
   }

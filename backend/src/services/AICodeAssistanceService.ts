@@ -35,6 +35,29 @@ export interface CodeExplanation {
   suggestions?: string[];
 }
 
+export interface RefactoringSuggestion {
+  type: 'extract_method' | 'rename_variable' | 'simplify_logic' | 'optimize_performance' | 'improve_readability';
+  title: string;
+  description: string;
+  originalCode: string;
+  suggestedCode: string;
+  confidence: number;
+}
+
+export interface ErrorFix {
+  errorType: string;
+  description: string;
+  suggestedFix: string;
+  explanation: string;
+  confidence: number;
+}
+
+export interface DocumentationSuggestion {
+  type: 'function' | 'class' | 'variable' | 'module';
+  documentation: string;
+  format: 'jsdoc' | 'docstring' | 'inline' | 'markdown';
+}
+
 export class AICodeAssistanceService {
   /**
    * Generate code completions based on context
@@ -265,6 +288,118 @@ Respond with only the generated code, no additional explanation:`;
   }
 
   /**
+   * Build prompt for refactoring suggestions
+   */
+  private buildRefactoringPrompt(code: string, language: string): string {
+    return `You are a code refactoring assistant. Analyze the following ${language} code and suggest improvements.
+
+Code to analyze:
+\`\`\`${language}
+${code}
+\`\`\`
+
+Provide refactoring suggestions focusing on:
+1. Code readability and maintainability
+2. Performance optimizations
+3. Best practices and patterns
+4. Simplification opportunities
+
+Format your response as JSON:
+{
+  "suggestions": [
+    {
+      "type": "extract_method|rename_variable|simplify_logic|optimize_performance|improve_readability",
+      "title": "Brief title of the suggestion",
+      "description": "Detailed description of the improvement",
+      "originalCode": "code snippet to be changed",
+      "suggestedCode": "improved code snippet",
+      "confidence": 0.8
+    }
+  ]
+}
+
+Provide 1-3 most impactful suggestions with confidence scores (0.0-1.0).`;
+  }
+
+  /**
+   * Build prompt for comment-to-code generation
+   */
+  private buildCommentToCodePrompt(comments: string, language: string, context?: string): string {
+    const contextSection = context ? `\n\nExisting context:\n\`\`\`${language}\n${context}\n\`\`\`` : '';
+
+    return `You are a code generation assistant. Generate ${language} code based on the following comments/description.
+
+Comments/Description:
+${comments}${contextSection}
+
+Requirements:
+1. Generate clean, readable, and well-structured code
+2. Follow ${language} best practices and conventions
+3. Include appropriate error handling
+4. Add inline comments for complex logic
+5. Make the code production-ready
+
+Respond with only the generated code, no additional explanation:`;
+  }
+
+  /**
+   * Build prompt for error fix suggestions
+   */
+  private buildErrorFixPrompt(errorMessage: string, code: string, language: string): string {
+    return `You are a debugging assistant. Analyze the following ${language} error and suggest fixes.
+
+Error message:
+${errorMessage}
+
+Code with error:
+\`\`\`${language}
+${code}
+\`\`\`
+
+Provide fix suggestions that address the error. Format your response as JSON:
+{
+  "fixes": [
+    {
+      "errorType": "syntax|runtime|logic|type",
+      "description": "Description of what's causing the error",
+      "suggestedFix": "corrected code snippet",
+      "explanation": "explanation of why this fix works",
+      "confidence": 0.9
+    }
+  ]
+}
+
+Focus on the most likely causes and provide practical, working solutions.`;
+  }
+
+  /**
+   * Build prompt for documentation generation
+   */
+  private buildDocumentationPrompt(code: string, language: string): string {
+    return `You are a documentation assistant. Generate appropriate documentation for the following ${language} code.
+
+Code to document:
+\`\`\`${language}
+${code}
+\`\`\`
+
+Generate documentation that includes:
+1. Purpose and functionality description
+2. Parameters and return values (if applicable)
+3. Usage examples (if helpful)
+4. Any important notes or warnings
+
+Format your response as JSON:
+{
+  "type": "function|class|variable|module",
+  "documentation": "formatted documentation string",
+  "format": "jsdoc|docstring|inline|markdown"
+}
+
+Use the appropriate documentation format for the ${language} language.`;
+  }
+
+  /**
    * Parse code generation response from Ollama
    */
   private parseCodeGenerationResponse(response: string): string {
@@ -277,6 +412,214 @@ Respond with only the generated code, no additional explanation:`;
     }
 
     return response.trim();
+  }
+
+  /**
+   * Parse refactoring response from Ollama
+   */
+  private parseRefactoringResponse(response: string, originalCode: string): RefactoringSuggestion[] {
+    try {
+      const parsed = JSON.parse(response);
+      if (parsed.suggestions && Array.isArray(parsed.suggestions)) {
+        return parsed.suggestions.map((suggestion: any) => ({
+          type: suggestion.type || 'improve_readability',
+          title: suggestion.title || 'Code improvement',
+          description: suggestion.description || '',
+          originalCode: suggestion.originalCode || originalCode,
+          suggestedCode: suggestion.suggestedCode || '',
+          confidence: Math.min(Math.max(suggestion.confidence || 0.5, 0), 1),
+        }));
+      }
+    } catch {
+      logger.logWarning('Failed to parse refactoring response as JSON, using fallback');
+    }
+
+    // Fallback: create a generic suggestion
+    return [{
+      type: 'improve_readability',
+      title: 'AI Suggestion',
+      description: response.trim(),
+      originalCode,
+      suggestedCode: response.trim(),
+      confidence: 0.5,
+    }];
+  }
+
+  /**
+   * Parse error fix response from Ollama
+   */
+  private parseErrorFixResponse(response: string): ErrorFix[] {
+    try {
+      const parsed = JSON.parse(response);
+      if (parsed.fixes && Array.isArray(parsed.fixes)) {
+        return parsed.fixes.map((fix: any) => ({
+          errorType: fix.errorType || 'unknown',
+          description: fix.description || '',
+          suggestedFix: fix.suggestedFix || '',
+          explanation: fix.explanation || '',
+          confidence: Math.min(Math.max(fix.confidence || 0.5, 0), 1),
+        }));
+      }
+    } catch {
+      logger.logWarning('Failed to parse error fix response as JSON, using fallback');
+    }
+
+    // Fallback: create a generic fix suggestion
+    return [{
+      errorType: 'unknown',
+      description: 'AI-suggested fix',
+      suggestedFix: response.trim(),
+      explanation: 'Generated fix based on error analysis',
+      confidence: 0.5,
+    }];
+  }
+
+  /**
+   * Parse documentation response from Ollama
+   */
+  private parseDocumentationResponse(response: string, language: string): DocumentationSuggestion {
+    try {
+      const parsed = JSON.parse(response);
+      return {
+        type: parsed.type || 'function',
+        documentation: parsed.documentation || response.trim(),
+        format: parsed.format || this.getDefaultDocFormat(language),
+      };
+    } catch {
+      // Fallback: use raw response as documentation
+      return {
+        type: 'function',
+        documentation: response.trim(),
+        format: this.getDefaultDocFormat(language),
+      };
+    }
+  }
+
+  /**
+   * Get default documentation format for language
+   */
+  private getDefaultDocFormat(language: string): DocumentationSuggestion['format'] {
+    const formatMap: Record<string, DocumentationSuggestion['format']> = {
+      javascript: 'jsdoc',
+      typescript: 'jsdoc',
+      python: 'docstring',
+      java: 'jsdoc',
+      cpp: 'inline',
+      c: 'inline',
+      csharp: 'inline',
+      go: 'inline',
+      rust: 'inline',
+      php: 'inline',
+      ruby: 'inline',
+    };
+
+    return formatMap[language] || 'inline';
+  }
+
+  /**
+   * Generate refactoring suggestions for code
+   */
+  async getRefactoringSuggestions(code: string, language: string): Promise<RefactoringSuggestion[]> {
+    try {
+      const isAvailable = await ollamaClient.isAvailable();
+      if (!isAvailable) {
+        throw new Error('Ollama service is not available');
+      }
+
+      const prompt = this.buildRefactoringPrompt(code, language);
+      const response = await ollamaClient.generate(prompt, {
+        model: process.env.OLLAMA_MODEL || 'llama3',
+        temperature: 0.4,
+        max_tokens: 1200,
+      });
+
+      return this.parseRefactoringResponse(response, code);
+    } catch (error) {
+      logger.logError(error instanceof Error ? error : new Error(String(error)), {
+        language,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Generate code from comments
+   */
+  async generateCodeFromComments(comments: string, language: string, context?: string): Promise<string> {
+    try {
+      const isAvailable = await ollamaClient.isAvailable();
+      if (!isAvailable) {
+        throw new Error('Ollama service is not available');
+      }
+
+      const prompt = this.buildCommentToCodePrompt(comments, language, context);
+      const response = await ollamaClient.generate(prompt, {
+        model: process.env.OLLAMA_MODEL || 'llama3',
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      return this.parseCodeGenerationResponse(response);
+    } catch (error) {
+      logger.logError(error instanceof Error ? error : new Error(String(error)), {
+        language,
+        comments,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Suggest fixes for errors
+   */
+  async suggestErrorFixes(errorMessage: string, code: string, language: string): Promise<ErrorFix[]> {
+    try {
+      const isAvailable = await ollamaClient.isAvailable();
+      if (!isAvailable) {
+        throw new Error('Ollama service is not available');
+      }
+
+      const prompt = this.buildErrorFixPrompt(errorMessage, code, language);
+      const response = await ollamaClient.generate(prompt, {
+        model: process.env.OLLAMA_MODEL || 'llama3',
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      return this.parseErrorFixResponse(response);
+    } catch (error) {
+      logger.logError(error instanceof Error ? error : new Error(String(error)), {
+        language,
+        errorMessage,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Generate documentation for code
+   */
+  async generateDocumentation(code: string, language: string): Promise<DocumentationSuggestion> {
+    try {
+      const isAvailable = await ollamaClient.isAvailable();
+      if (!isAvailable) {
+        throw new Error('Ollama service is not available');
+      }
+
+      const prompt = this.buildDocumentationPrompt(code, language);
+      const response = await ollamaClient.generate(prompt, {
+        model: process.env.OLLAMA_MODEL || 'llama3',
+        temperature: 0.4,
+        max_tokens: 800,
+      });
+
+      return this.parseDocumentationResponse(response, language);
+    } catch (error) {
+      logger.logError(error instanceof Error ? error : new Error(String(error)), {
+        language,
+      });
+      throw error;
+    }
   }
 
   /**

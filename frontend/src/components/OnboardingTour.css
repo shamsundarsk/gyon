@@ -1,0 +1,287 @@
+/**
+ * Onboarding Tour Styles
+ * Styling for the guided tour and help system
+ */
+
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    pointer-events: none;
+}
+
+.onboarding-tour {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-primary, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 480px;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.onboarding-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.onboarding-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.onboarding-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-secondary, #6b7280);
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: var(--bg-hover, #e2e8f0);
+    color: var(--text-primary, #2d3748);
+}
+
+.onboarding-body {
+    padding: 20px 24px;
+}
+
+.onboarding-body p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-secondary, #6b7280);
+}
+
+.onboarding-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-secondary, #f8f9fa);
+}
+
+.progress-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border-color, #e2e8f0);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.progress-dot:hover {
+    background: var(--primary-300, #93c5fd);
+}
+
+.progress-dot.active {
+    background: var(--primary-600, #2563eb);
+    transform: scale(1.2);
+}
+
+.progress-dot.completed {
+    background: var(--success-500, #10b981);
+}
+
+.progress-text {
+    font-size: 13px;
+    color: var(--text-secondary, #6b7280);
+    font-weight: 500;
+}
+
+.onboarding-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: var(--primary-600, #2563eb);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-700, #1d4ed8);
+}
+
+.btn-secondary {
+    background: var(--bg-primary, #ffffff);
+    color: var(--text-primary, #2d3748);
+    border-color: var(--border-color, #e2e8f0);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--bg-hover, #e2e8f0);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Highlight effect for targeted elements */
+.onboarding-highlight {
+    position: relative;
+    z-index: 9997;
+    box-shadow: 0 0 0 4px var(--primary-500, #3b82f6), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+    border-radius: 4px;
+    animation: onboarding-pulse 2s infinite;
+}
+
+@keyframes onboarding-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px var(--primary-500, #3b82f6), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px var(--primary-400, #60a5fa), 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+}
+
+/* Dark theme styles */
+[data-theme="dark"] .onboarding-tour {
+    background: var(--bg-primary-dark, #1f2937);
+}
+
+[data-theme="dark"] .onboarding-header {
+    border-bottom-color: var(--border-color-dark, #4b5563);
+}
+
+[data-theme="dark"] .onboarding-header h2 {
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .close-btn {
+    color: var(--text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .close-btn:hover {
+    background: var(--bg-hover-dark, #4b5563);
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .onboarding-body p {
+    color: var(--text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .onboarding-progress {
+    border-top-color: var(--border-color-dark, #4b5563);
+    border-bottom-color: var(--border-color-dark, #4b5563);
+    background: var(--bg-secondary-dark, #374151);
+}
+
+[data-theme="dark"] .progress-dot {
+    background: var(--border-color-dark, #4b5563);
+}
+
+[data-theme="dark"] .progress-dot:hover {
+    background: var(--primary-400, #60a5fa);
+}
+
+[data-theme="dark"] .progress-text {
+    color: var(--text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: var(--bg-secondary-dark, #374151);
+    color: var(--text-primary-dark, #f9fafb);
+    border-color: var(--border-color-dark, #4b5563);
+}
+
+[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+    background: var(--bg-hover-dark, #4b5563);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .onboarding-tour {
+        width: 95%;
+        max-width: none;
+    }
+
+    .onboarding-header,
+    .onboarding-body,
+    .onboarding-progress,
+    .onboarding-actions {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .onboarding-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .navigation-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 480px) {
+    .onboarding-header h2 {
+        font-size: 16px;
+    }
+
+    .onboarding-body p {
+        font-size: 14px;
+    }
+
+    .progress-dots {
+        gap: 6px;
+    }
+
+    .progress-dot {
+        width: 6px;
+        height: 6px;
+    }
+}

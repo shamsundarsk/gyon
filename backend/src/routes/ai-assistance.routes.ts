@@ -116,6 +116,138 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
 });
 
 /**
+ * POST /api/ai-assistance/refactor
+ * Get refactoring suggestions for code
+ */
+router.post('/refactor', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code, language } = req.body;
+    if (!code || !language) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: code, language',
+      });
+      return;
+    }
+
+    const suggestions = await aiCodeAssistanceService.getRefactoringSuggestions(code, language);
+
+    res.json({
+      success: true,
+      data: {
+        suggestions,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Refactoring suggestions error:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get refactoring suggestions',
+    });
+  }
+});
+
+/**
+ * POST /api/ai-assistance/generate-from-comments
+ * Generate code from comments/description
+ */
+router.post('/generate-from-comments', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { comments, language, context } = req.body;
+    if (!comments || !language) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: comments, language',
+      });
+      return;
+    }
+
+    const generatedCode = await aiCodeAssistanceService.generateCodeFromComments(comments, language, context);
+
+    res.json({
+      success: true,
+      data: {
+        code: generatedCode,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Code generation from comments error:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate code from comments',
+    });
+  }
+});
+
+/**
+ * POST /api/ai-assistance/fix-error
+ * Get error fix suggestions
+ */
+router.post('/fix-error', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { errorMessage, code, language } = req.body;
+    if (!errorMessage || !code || !language) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: errorMessage, code, language',
+      });
+      return;
+    }
+
+    const fixes = await aiCodeAssistanceService.suggestErrorFixes(errorMessage, code, language);
+
+    res.json({
+      success: true,
+      data: {
+        fixes,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Error fix suggestions error:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get error fix suggestions',
+    });
+  }
+});
+
+/**
+ * POST /api/ai-assistance/generate-docs
+ * Generate documentation for code
+ */
+router.post('/generate-docs', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code, language } = req.body;
+    if (!code || !language) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: code, language',
+      });
+      return;
+    }
+
+    const documentation = await aiCodeAssistanceService.generateDocumentation(code, language);
+
+    res.json({
+      success: true,
+      data: {
+        documentation,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Documentation generation error:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate documentation',
+    });
+  }
+});
+
+/**
  * GET /api/ai-assistance/status
  * Check AI assistance availability
  */

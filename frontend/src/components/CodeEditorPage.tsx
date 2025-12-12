@@ -2,9 +2,21 @@ import React, { useState, useEffect } from 'react';
 import CodeEditor, { CodeFile } from './CodeEditor';
 import FileExplorer, { FileNode } from './FileExplorer';
 import FileTabs from './FileTabs';
+import ProjectSwitcher from './ProjectSwitcher';
+import ProjectTemplateSelector from './ProjectTemplateSelector';
+import Console from './Console';
+import CodeRunner from './CodeRunner';
+import LivePreview from './LivePreview';
 import { useFileManager } from '../hooks/useFileManager';
 import { projectImportService } from '../services/ProjectImportService';
+import { ProjectTemplate } from '../services/ProjectTemplates';
+import { ProjectExportService } from '../services/ProjectExportService';
+import { Project } from '../services/FileManager';
 import { MashupResponse } from '../types';
+import { ExecutionResult } from '../services/CodeExecutionService';
+import ProjectGallery from './ProjectGallery';
+import ProjectSharingDialog from './ProjectSharingDialog';
+import { ProjectTemplate as SharingProjectTemplate, ProjectFile } from '../services/ProjectSharingService';
 import './CodeEditorPage.css';
 
 interface CodeEditorPageProps {
@@ -28,18 +40,32 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
   const [importedProject, setImportedProject] = useState<any>(null);
   const [importLoading, setImportLoading] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(300);
+  const [isBottomPanelVisible, setIsBottomPanelVisible] = useState(true);
+  const [activeBottomTab, setActiveBottomTab] = useState<'console' | 'runner' | 'preview'>('console');
+  const [isResizingBottom, setIsResizingBottom] = useState(false);
+  const [showProjectGallery, setShowProjectGallery] = useState(false);
+  const [showSharingDialog, setShowSharingDialog] = useState(false);
 
   const {
+    projects,
     activeProject,
     isLoading,
     error,
     createProject,
+    loadProject,
+    deleteProject,
     createFile,
     createFolder,
     updateFile,
     deleteFile,
     clearError
   } = useFileManager();
+
+  // const templatesService = ProjectTemplatesService.getInstance();
+  const exportService = ProjectExportService.getInstance();
 
   // Import mashup project if available
   useEffect(() => {
@@ -242,6 +268,183 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
     }
   };
 
+  // Project management handlers
+  const handleProjectSelect = async (project: Project) => {
+    try {
+      await loadProject(project.id);
+      // Clear current open files when switching projects
+      setOpenFiles([]);
+      setActiveFile(null);
+    } catch (err) {
+      console.error('Failed to load project:', err);
+    }
+  };
+
+  const handleProjectCreate = () => {
+    setShowTemplateSelector(true);
+  };
+
+  const handleTemplateSelect = async (template: ProjectTemplate | null, projectName: string, description: string) => {
+    try {
+      let newProject: Project;
+      
+      if (template) {
+        // Create project from template
+        newProject = await createProject(projectName, description);
+        
+        // Add template files to the project
+        // This would require extending the FileManager to support bulk file creation
+        // For now, we'll create a basic project and let the user know about the template
+        console.log('Template selected:', template.name);
+      } else {
+        // Create blank project
+        newProject = await createProject(projectName, description);
+      }
+      
+      setShowTemplateSelector(false);
+      
+      // Open the first file if available
+      if (newProject.files.length > 0) {
+        const firstFile = findFirstFile(newProject.files);
+        if (firstFile) {
+          handleFileSelect(firstFile);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to create project:', err);
+    }
+  };
+
+  const handleProjectDelete = async (project: Project) => {
+    try {
+      await deleteProject(project.id);
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+    }
+  };
+
+  const handleProjectExport = async (project: Project) => {
+    try {
+      await exportService.exportProject(project, { format: 'zip' });
+    } catch (err) {
+      console.error('Failed to export project:', err);
+      alert('Failed to export project. Please try again.');
+    }
+  };
+
+  const handleImportFromGallery = async (template: SharingProjectTemplate) => {
+    try {
+      // Create a new project with the template name and description
+      const newProject = await createProject(template.name, template.description);
+      
+      // Load the project to make it active
+      await loadProject(newProject.id);
+      
+      // Create files from template
+      for (const file of template.files) {
+        await createFile(file.path, file.content);
+      }
+      
+      setShowProjectGallery(false);
+      
+      // Open the first file
+      if (template.files.length > 0) {
+        const firstFile = template.files[0];
+        const codeFile: CodeFile = {
+          id: firstFile.path,
+          name: firstFile.path.split('/').pop() || firstFile.path,
+          content: firstFile.content,
+          language: firstFile.language,
+          path: firstFile.path,
+        };
+        setOpenFiles([codeFile]);
+        setActiveFile(codeFile);
+      }
+    } catch (err) {
+      console.error('Failed to import project from gallery:', err);
+      alert('Failed to import project. Please try again.');
+    }
+  };
+
+  const handleProjectShared = (shareUrl: string) => {
+    console.log('Project shared successfully:', shareUrl);
+    // Could show a success notification here
+  };
+
+  const getCurrentProjectFiles = (): ProjectFile[] => {
+    return openFiles.map(file => ({
+      path: file.path || file.name,
+      content: file.content,
+      language: file.language,
+      lastModified: new Date(),
+    }));
+  };
+
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
+  const handleExecutionComplete = (result: ExecutionResult) => {
+    // Switch to console tab to show results
+    if (result.errors.length > 0 || result.output.length > 0) {
+      setActiveBottomTab('console');
+      setIsBottomPanelVisible(true);
+    }
+  };
+
+  const handleToggleBottomPanel = () => {
+    setIsBottomPanelVisible(!isBottomPanelVisible);
+  };
+
+  const getAllProjectFiles = (): CodeFile[] => {
+    if (importedProject) {
+      return importedProject.files;
+    }
+    
+    if (activeProject) {
+      // Convert FileNodes to CodeFiles
+      const convertFileNodes = (nodes: FileNode[]): CodeFile[] => {
+        const files: CodeFile[] = [];
+        
+        const traverse = (node: FileNode) => {
+          if (node.type === 'file') {
+            files.push({
+              id: node.id,
+              name: node.name,
+              content: node.content || '',
+              language: getLanguageFromPath(node.path),
+              path: node.path
+            });
+          } else if (node.children) {
+            node.children.forEach(traverse);
+          }
+        };
+        
+        nodes.forEach(traverse);
+        return files;
+      };
+      
+      return convertFileNodes(activeProject.files);
+    }
+    
+    return [];
+  };
+
+  // Helper function to find the first file in a file tree
+  const findFirstFile = (files: FileNode[]): FileNode | null => {
+    for (const file of files) {
+      if (file.type === 'file') {
+        return file;
+      } else if (file.children) {
+        const found = findFirstFile(file.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsResizing(true);
     e.preventDefault();
@@ -258,19 +461,39 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
 
   const handleMouseUp = () => {
     setIsResizing(false);
+    setIsResizingBottom(false);
+  };
+
+  const handleBottomMouseDown = (e: React.MouseEvent) => {
+    setIsResizingBottom(true);
+    e.preventDefault();
+  };
+
+  const handleBottomMouseMove = (e: MouseEvent) => {
+    if (!isResizingBottom) return;
+    
+    const newHeight = window.innerHeight - e.clientY;
+    if (newHeight >= 150 && newHeight <= 600) {
+      setBottomPanelHeight(newHeight);
+    }
   };
 
   useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
+    const handleMouseMoveWrapper = (e: MouseEvent) => {
+      handleMouseMove(e);
+      handleBottomMouseMove(e);
+    };
+
+    if (isResizing || isResizingBottom) {
+      document.addEventListener('mousemove', handleMouseMoveWrapper);
       document.addEventListener('mouseup', handleMouseUp);
       
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mousemove', handleMouseMoveWrapper);
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isResizing]);
+  }, [isResizing, isResizingBottom]);
 
   if (isLoading || importLoading) {
     return (
@@ -302,15 +525,39 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
               ← Back to Generator
             </button>
           )}
-          <h1 className="editor-title">
-            AI Code Editor
-            {importedProject && <span className="project-name"> - {importedProject.name}</span>}
-            {!importedProject && activeProject && <span className="project-name"> - {activeProject.name}</span>}
-          </h1>
+          <h1 className="editor-title">AI Code Editor</h1>
+          <ProjectSwitcher
+            projects={projects}
+            activeProject={activeProject}
+            onProjectSelect={handleProjectSelect}
+            onProjectCreate={handleProjectCreate}
+            onProjectDelete={handleProjectDelete}
+            onProjectExport={handleProjectExport}
+            isLoading={isLoading}
+          />
         </div>
         <div className="header-right">
-          <button className="theme-toggle" title="Toggle theme">
-            🌙
+          <button 
+            className="gallery-button" 
+            title="Browse Project Gallery"
+            onClick={() => setShowProjectGallery(true)}
+          >
+            📚 Gallery
+          </button>
+          <button 
+            className="share-button" 
+            title="Share Project"
+            onClick={() => setShowSharingDialog(true)}
+            disabled={!activeProject || openFiles.length === 0}
+          >
+            🔗 Share
+          </button>
+          <button 
+            className="theme-toggle" 
+            title="Toggle theme"
+            onClick={handleThemeToggle}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
       </div>
@@ -335,23 +582,128 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
         />
         
         <div className="main-content">
-          <FileTabs
-            openFiles={openFiles}
-            activeFile={activeFile}
-            onFileSelect={setActiveFile}
-            onFileClose={handleFileClose}
-            onFileCloseAll={handleFileCloseAll}
-          />
-          
-          <div className="editor-area">
-            <CodeEditor
-              file={activeFile}
-              onFileChange={handleFileChange}
-              height="100%"
+          <div className="editor-section">
+            <FileTabs
+              openFiles={openFiles}
+              activeFile={activeFile}
+              onFileSelect={setActiveFile}
+              onFileClose={handleFileClose}
+              onFileCloseAll={handleFileCloseAll}
             />
+            
+            <div className="editor-area">
+              <CodeEditor
+                file={activeFile}
+                onFileChange={handleFileChange}
+                onRunCode={(_file) => {
+                  setActiveBottomTab('runner');
+                  setIsBottomPanelVisible(true);
+                  // The CodeRunner will handle the actual execution
+                }}
+                height="100%"
+                theme={theme}
+              />
+            </div>
           </div>
+          
+          {isBottomPanelVisible && (
+            <>
+              <div 
+                className="bottom-resize-handle"
+                onMouseDown={handleBottomMouseDown}
+              />
+              
+              <div 
+                className="bottom-panel"
+                style={{ height: `${bottomPanelHeight}px` }}
+              >
+                <div className="bottom-panel-header">
+                  <div className="bottom-panel-tabs">
+                    <button
+                      className={`bottom-tab ${activeBottomTab === 'console' ? 'active' : ''}`}
+                      onClick={() => setActiveBottomTab('console')}
+                    >
+                      🖥️ Console
+                    </button>
+                    <button
+                      className={`bottom-tab ${activeBottomTab === 'runner' ? 'active' : ''}`}
+                      onClick={() => setActiveBottomTab('runner')}
+                    >
+                      ▶️ Runner
+                    </button>
+                    <button
+                      className={`bottom-tab ${activeBottomTab === 'preview' ? 'active' : ''}`}
+                      onClick={() => setActiveBottomTab('preview')}
+                    >
+                      👁️ Preview
+                    </button>
+                  </div>
+                  
+                  <button
+                    className="bottom-panel-close"
+                    onClick={handleToggleBottomPanel}
+                    title="Hide bottom panel"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="bottom-panel-content">
+                  {activeBottomTab === 'console' && (
+                    <Console />
+                  )}
+                  {activeBottomTab === 'runner' && (
+                    <CodeRunner
+                      file={activeFile}
+                      onExecutionComplete={handleExecutionComplete}
+                    />
+                  )}
+                  {activeBottomTab === 'preview' && (
+                    <LivePreview
+                      files={getAllProjectFiles()}
+                      activeFile={activeFile}
+                    />
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          
+          {!isBottomPanelVisible && (
+            <div className="bottom-panel-toggle">
+              <button
+                className="show-bottom-panel"
+                onClick={handleToggleBottomPanel}
+                title="Show bottom panel"
+              >
+                🔼 Show Panel
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      <ProjectTemplateSelector
+        isOpen={showTemplateSelector}
+        onTemplateSelect={handleTemplateSelect}
+        onCancel={() => setShowTemplateSelector(false)}
+      />
+
+      {showProjectGallery && (
+        <ProjectGallery
+          onImportProject={handleImportFromGallery}
+          onClose={() => setShowProjectGallery(false)}
+        />
+      )}
+
+      {showSharingDialog && activeProject && (
+        <ProjectSharingDialog
+          projectName={activeProject.name}
+          projectFiles={getCurrentProjectFiles()}
+          onClose={() => setShowSharingDialog(false)}
+          onShared={handleProjectShared}
+        />
+      )}
     </div>
   );
 };

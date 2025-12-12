@@ -88,11 +88,19 @@ describe('FileManager', () => {
     let testProject: Project;
 
     beforeEach(async () => {
-      // Ensure clean state for each test
-      localStorageMock.getItem.mockReturnValue('[]');
+      // Create a storage object to simulate localStorage
+      const storage: Record<string, string> = {};
+      
+      // Mock localStorage with dynamic storage
+      localStorageMock.getItem.mockImplementation((key: string) => storage[key] || null);
+      localStorageMock.setItem.mockImplementation((key: string, value: string) => {
+        storage[key] = value;
+      });
+      
+      // Start with empty storage
+      storage['ai-code-editor-projects'] = '[]';
+      
       testProject = await fileManager.createProject('Test Project');
-      // Mock the project exists in storage
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([testProject]));
     });
 
     it('creates a new file', async () => {
@@ -193,7 +201,22 @@ describe('FileManager', () => {
       localStorageMock.getItem.mockReturnValue('[]');
       
       const project = await fileManager.createProject('Test Project');
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([project]));
+      
+      // Update mock to include the project after creation
+      let projectsData = [project];
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'ai-code-editor-projects') {
+          return JSON.stringify(projectsData);
+        }
+        return null;
+      });
+      
+      // Mock setItem to update our data
+      localStorageMock.setItem.mockImplementation((key, value) => {
+        if (key === 'ai-code-editor-projects') {
+          projectsData = JSON.parse(value);
+        }
+      });
       
       await fileManager.createFile(project.id, 'test.js', 'original content');
       

@@ -1,0 +1,302 @@
+/**
+ * User Preferences Panel Styles
+ * Styling for the comprehensive settings interface
+ */
+
+.preferences-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.preferences-panel {
+    background: var(--bg-primary, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.preferences-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.preferences-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-secondary, #6b7280);
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: var(--bg-hover, #e2e8f0);
+    color: var(--text-primary, #2d3748);
+}
+
+.preferences-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-secondary, #f8f9fa);
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary, #6b7280);
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    background: var(--bg-hover, #e2e8f0);
+    color: var(--text-primary, #2d3748);
+}
+
+.tab.active {
+    background: var(--bg-primary, #ffffff);
+    color: var(--primary-600, #2563eb);
+    border-bottom-color: var(--primary-600, #2563eb);
+}
+
+.preferences-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.preference-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+}
+
+.preference-group {
+    margin-bottom: 20px;
+}
+
+.preference-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #2d3748);
+}
+
+.preference-group input[type="number"],
+.preference-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-primary, #2d3748);
+    background: var(--bg-primary, #ffffff);
+    transition: border-color 0.2s ease;
+}
+
+.preference-group input[type="number"]:focus,
+.preference-group select:focus {
+    outline: none;
+    border-color: var(--primary-500, #3b82f6);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.preferences-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-secondary, #f8f9fa);
+}
+
+.action-group {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: var(--primary-600, #2563eb);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-700, #1d4ed8);
+}
+
+.btn-secondary {
+    background: var(--bg-primary, #ffffff);
+    color: var(--text-primary, #2d3748);
+    border-color: var(--border-color, #e2e8f0);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover, #e2e8f0);
+}
+
+.file-input-label {
+    display: inline-block;
+}
+
+/* Dark theme styles */
+[data-theme="dark"] .preferences-panel {
+    background: var(--bg-primary-dark, #1f2937);
+}
+
+[data-theme="dark"] .preferences-header {
+    border-bottom-color: var(--border-color-dark, #4b5563);
+}
+
+[data-theme="dark"] .preferences-header h2 {
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .close-btn {
+    color: var(--text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .close-btn:hover {
+    background: var(--bg-hover-dark, #4b5563);
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .preferences-tabs {
+    border-bottom-color: var(--border-color-dark, #4b5563);
+    background: var(--bg-secondary-dark, #374151);
+}
+
+[data-theme="dark"] .tab {
+    color: var(--text-secondary-dark, #9ca3af);
+}
+
+[data-theme="dark"] .tab:hover {
+    background: var(--bg-hover-dark, #4b5563);
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .tab.active {
+    background: var(--bg-primary-dark, #1f2937);
+    color: var(--primary-400, #60a5fa);
+    border-bottom-color: var(--primary-400, #60a5fa);
+}
+
+[data-theme="dark"] .preference-section h3,
+[data-theme="dark"] .preference-group label {
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .preference-group input[type="number"],
+[data-theme="dark"] .preference-group select {
+    background: var(--bg-secondary-dark, #374151);
+    border-color: var(--border-color-dark, #4b5563);
+    color: var(--text-primary-dark, #f9fafb);
+}
+
+[data-theme="dark"] .preferences-actions {
+    border-top-color: var(--border-color-dark, #4b5563);
+    background: var(--bg-secondary-dark, #374151);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: var(--bg-secondary-dark, #374151);
+    color: var(--text-primary-dark, #f9fafb);
+    border-color: var(--border-color-dark, #4b5563);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: var(--bg-hover-dark, #4b5563);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .preferences-overlay {
+        padding: 10px;
+    }
+
+    .preferences-panel {
+        max-height: 90vh;
+    }
+
+    .preferences-header,
+    .preferences-content,
+    .preferences-actions {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .action-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .preferences-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
