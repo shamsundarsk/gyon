@@ -3,6 +3,7 @@ import './App.css';
 import {
   LoadingSpinner,
   MashupResults,
+  CodeEditorPage,
 } from './components';
 import { FAQ } from './components/FAQ';
 import { AIChatbot } from './components/AIChatbot';
@@ -27,7 +28,7 @@ function App() {
   
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'landing' | 'generate' | 'results'>('landing');
+  const [currentPage, setCurrentPage] = useState<'landing' | 'generate' | 'results' | 'editor'>('landing');
 
   const handleGenerate = (problemStatement?: string) => {
     generate(problemStatement);
@@ -47,6 +48,14 @@ function App() {
     setCurrentPage('landing');
   };
 
+  const handleOpenEditor = () => {
+    setCurrentPage('editor');
+  };
+
+  const handleBackFromEditor = () => {
+    setCurrentPage('results');
+  };
+
   const handleDownload = () => {
     download();
   };
@@ -59,6 +68,18 @@ function App() {
     e.preventDefault();
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Show code editor page
+  if (currentPage === 'editor') {
+    return (
+      <div className="app">
+        <CodeEditorPage 
+          onBack={handleBackFromEditor} 
+          mashupData={mashupData}
+        />
+      </div>
+    );
+  }
 
   // Show results page if data exists and we're on results page
   if (mashupData && !isLoading && currentPage === 'results') {
@@ -106,6 +127,7 @@ function App() {
               onDownload={handleDownload}
               onRegenerate={handleRegenerate}
               onCustomGenerate={handleCustomGenerate}
+              onOpenEditor={handleOpenEditor}
               isDownloading={isDownloading}
               downloadSuccess={downloadSuccess}
             />

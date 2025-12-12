@@ -15,6 +15,7 @@ interface MashupResultsProps {
   onDownload: () => void;
   onRegenerate: () => void;
   onCustomGenerate: (apiIds: string[]) => void;
+  onOpenEditor?: () => void;
   isDownloading?: boolean;
   downloadSuccess?: boolean;
 }
@@ -37,6 +38,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
   onDownload,
   onRegenerate,
   onCustomGenerate,
+  onOpenEditor,
   isDownloading = false,
   downloadSuccess = false,
 }) => {
@@ -48,6 +50,12 @@ const MashupResults: React.FC<MashupResultsProps> = ({
           isDownloading={isDownloading}
           downloadSuccess={downloadSuccess}
         />
+        {onOpenEditor && (
+          <button className="btn btn-primary open-editor-btn" onClick={onOpenEditor}>
+            <span className="btn-icon">💻</span>
+            Open in Editor
+          </button>
+        )}
         <RegenerateButton onClick={onRegenerate} />
         <CustomGenerateButton onGenerate={onCustomGenerate} />
       </div>

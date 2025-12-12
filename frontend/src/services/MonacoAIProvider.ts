@@ -1,0 +1,185 @@
+/**
+ * Monaco Editor AI Completion Provider
+ * Integrates AI assistance with Monaco Editor
+ */
+
+import * as monaco from 'monaco-editor';
+import { aiAssistanceService, CodeContext, CodeCompletion } from './ai-assistance.service';
+
+export class MonacoAIProvider {
+  private disposables: monaco.IDisposable[] = [];
+  private isEnabled: boolean = true;
+  private debounceTimeout: number | null = null;
+
+  /**
+   * Register AI completion provider for all languages
+   */
+  registerCompletionProvider(): void {
+    // Register for common programming languages
+    const languages = [
+      'javascript', 'typescript', 'python', 'java', 'cpp', 'c', 'csharp',
+      'go', 'rust', 'php', 'ruby', 'html', 'css', 'json', 'yaml', 'sql'
+    ];
+
+    languages.forEach(language => {
+      const disposable = monaco.languages.registerCompletionItemProvider(language, {
+        provideCompletionItems: this.provideCompletionItems.bind(this),
+        triggerCharacters: ['.', '(', '[', '{', ' ', '\n'],
+      });
+      this.disposables.push(disposable);
+    });
+  }
+
+  /**
+   * Provide completion items using AI
+   */
+  private async provideCompletionItems(
+    model: monaco.editor.ITextModel,
+    position: monaco.Position,
+    _context: monaco.languages.CompletionContext
+  ): Promise<monaco.languages.CompletionList | null> {
+    if (!this.isEnabled) {
+      return null;
+    }
+
+    try {
+      // Debounce requests to avoid too many API calls
+      if (this.debounceTimeout) {
+        window.clearTimeout(this.debounceTimeout);
+      }
+
+      return new Promise((resolve) => {
+        this.debounceTimeout = window.setTimeout(async () => {
+          try {
+            const completions = await this.getAICompletions(model, position);
+            resolve({
+              suggestions: completions,
+              incomplete: false,
+            });
+          } catch (error) {
+            console.warn('AI completion failed:', error);
+            resolve(null);
+          }
+        }, 300); // 300ms debounce
+      });
+    } catch (error) {
+      console.warn('AI completion error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get AI completions for the current context
+   */
+  private async getAICompletions(
+    model: monaco.editor.ITextModel,
+    position: monaco.Position
+  ): Promise<monaco.languages.CompletionItem[]> {
+    const content = model.getValue();
+    const language = model.getLanguageId();
+    
+    // Get current line and cursor position
+    const wordInfo = model.getWordUntilPosition(position);
+    
+    // Skip if we're in the middle of a word (let Monaco handle it)
+    if (wordInfo.word.length > 0 && position.column > wordInfo.startColumn + 1) {
+      return [];
+    }
+
+    const codeContext: CodeContext = {
+      content,
+      language,
+      position: {
+        line: position.lineNumber - 1, // Monaco uses 1-based, our API uses 0-based
+        column: position.column - 1,
+      },
+      filename: model.uri.path,
+    };
+
+    try {
+      const aiCompletions = await aiAssistanceService.getCodeCompletions(codeContext);
+      return this.convertToMonacoCompletions(aiCompletions, position, wordInfo);
+    } catch (error) {
+      console.warn('Failed to get AI completions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Convert AI completions to Monaco completion items
+   */
+  private convertToMonacoCompletions(
+    aiCompletions: CodeCompletion[],
+    position: monaco.Position,
+    wordInfo: monaco.editor.IWordAtPosition
+  ): monaco.languages.CompletionItem[] {
+    return aiCompletions.map((completion, index) => {
+      const kind = this.getMonacoCompletionKind(completion.kind);
+      
+      return {
+        label: completion.text,
+        kind,
+        detail: completion.detail || 'AI suggestion',
+        documentation: completion.documentation || completion.detail,
+        insertText: completion.insertText,
+        range: {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: wordInfo.startColumn,
+          endColumn: position.column,
+        },
+        sortText: `ai_${index.toString().padStart(3, '0')}`, // Sort AI suggestions after built-in ones
+        filterText: completion.text,
+        preselect: index === 0, // Preselect the first AI suggestion
+        // tags: [monaco.languages.CompletionItemTag.AI], // Mark as AI-generated (if supported)
+      };
+    });
+  }
+
+  /**
+   * Convert AI completion kind to Monaco completion kind
+   */
+  private getMonacoCompletionKind(kind: CodeCompletion['kind']): monaco.languages.CompletionItemKind {
+    const kindMap: Record<CodeCompletion['kind'], monaco.languages.CompletionItemKind> = {
+      function: monaco.languages.CompletionItemKind.Function,
+      variable: monaco.languages.CompletionItemKind.Variable,
+      class: monaco.languages.CompletionItemKind.Class,
+      method: monaco.languages.CompletionItemKind.Method,
+      property: monaco.languages.CompletionItemKind.Property,
+      keyword: monaco.languages.CompletionItemKind.Keyword,
+      snippet: monaco.languages.CompletionItemKind.Snippet,
+    };
+
+    return kindMap[kind] || monaco.languages.CompletionItemKind.Text;
+  }
+
+  /**
+   * Enable or disable AI completions
+   */
+  setEnabled(enabled: boolean): void {
+    this.isEnabled = enabled;
+  }
+
+  /**
+   * Check if AI completions are enabled
+   */
+  isAIEnabled(): boolean {
+    return this.isEnabled;
+  }
+
+  /**
+   * Dispose all registered providers
+   */
+  dispose(): void {
+    this.disposables.forEach(disposable => disposable.dispose());
+    this.disposables = [];
+    
+    if (this.debounceTimeout) {
+      window.clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+    }
+  }
+}
+
+// Global instance
+export const monacoAIProvider = new MonacoAIProvider();

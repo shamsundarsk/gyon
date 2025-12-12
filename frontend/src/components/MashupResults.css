@@ -44,6 +44,31 @@
     }
 }
 
+.open-editor-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.open-editor-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.open-editor-btn .btn-icon {
+    font-size: 16px;
+}
+
 .problem-statement-section {
     margin-bottom: 48px;
     animation: fadeInUp 0.5s ease-out 0.2s both;

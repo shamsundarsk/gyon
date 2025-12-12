@@ -1,0 +1,206 @@
+.file-tabs-container {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+    min-height: 40px;
+    overflow: hidden;
+}
+
+.file-tabs {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.file-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.file-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-secondary, #f8f9fa);
+    border-right: 1px solid var(--border-color, #e1e5e9);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+    max-width: 200px;
+    position: relative;
+    user-select: none;
+}
+
+.file-tab:hover {
+    background: var(--bg-hover, #e2e8f0);
+}
+
+.file-tab.active {
+    background: var(--bg-primary, #ffffff);
+    border-bottom: 2px solid var(--primary-500, #0066cc);
+}
+
+.tab-icon {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.tab-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary, #2d3748);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.file-tab.active .tab-name {
+    color: var(--primary-700, #0052a3);
+}
+
+.tab-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #718096);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px;
+    border-radius: 2px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-close:hover {
+    background: var(--error-100, #fee2e2);
+    color: var(--error-600, #dc2626);
+}
+
+.file-tabs-actions {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-left: 1px solid var(--border-color, #e1e5e9);
+}
+
+.close-all-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary, #718096);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.close-all-btn:hover {
+    background: var(--bg-hover, #e2e8f0);
+    color: var(--text-primary, #2d3748);
+}
+
+.file-tabs-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+    min-height: 40px;
+    padding: 0 16px;
+}
+
+.empty-message {
+    color: var(--text-secondary, #718096);
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .file-tabs-container {
+    background: var(--bg-secondary-dark, #2d3748);
+    border-bottom-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .file-tab {
+    background: var(--bg-secondary-dark, #2d3748);
+    border-right-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .file-tab:hover {
+    background: var(--bg-hover-dark, #4a5568);
+}
+
+[data-theme="dark"] .file-tab.active {
+    background: var(--bg-primary-dark, #1a202c);
+    border-bottom-color: var(--primary-400, #4299e1);
+}
+
+[data-theme="dark"] .tab-name {
+    color: var(--text-primary-dark, #f7fafc);
+}
+
+[data-theme="dark"] .file-tab.active .tab-name {
+    color: var(--primary-300, #63b3ed);
+}
+
+[data-theme="dark"] .tab-close {
+    color: var(--text-secondary-dark, #a0aec0);
+}
+
+[data-theme="dark"] .tab-close:hover {
+    background: var(--error-800, #991b1b);
+    color: var(--error-300, #fca5a5);
+}
+
+[data-theme="dark"] .file-tabs-actions {
+    border-left-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .close-all-btn {
+    color: var(--text-secondary-dark, #a0aec0);
+}
+
+[data-theme="dark"] .close-all-btn:hover {
+    background: var(--bg-hover-dark, #4a5568);
+    color: var(--text-primary-dark, #f7fafc);
+}
+
+[data-theme="dark"] .file-tabs-empty {
+    background: var(--bg-secondary-dark, #2d3748);
+    border-bottom-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .empty-message {
+    color: var(--text-secondary-dark, #a0aec0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .file-tab {
+        min-width: 100px;
+        max-width: 150px;
+        padding: 6px 8px;
+    }
+
+    .tab-name {
+        font-size: 12px;
+    }
+
+    .file-tabs-actions {
+        padding: 0 6px;
+    }
+
+    .close-all-btn {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+}

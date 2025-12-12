@@ -1,0 +1,211 @@
+.code-editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg-primary, #ffffff);
+    border: 1px solid var(--border-color, #e1e5e9);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.code-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg-secondary, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e1e5e9);
+    min-height: 40px;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-name {
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+    font-size: 14px;
+}
+
+.file-language {
+    background: var(--primary-100, #e6f3ff);
+    color: var(--primary-600, #0066cc);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.code-editor-wrapper {
+    flex: 1;
+    min-height: 0;
+}
+
+.code-editor-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--bg-primary, #ffffff);
+    border: 1px solid var(--border-color, #e1e5e9);
+    border-radius: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary, #718096);
+}
+
+.empty-state h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #2d3748);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .code-editor-container {
+    background: var(--bg-primary-dark, #1a202c);
+    border-color: var(--border-color-dark, #2d3748);
+}
+
+[data-theme="dark"] .code-editor-header {
+    background: var(--bg-secondary-dark, #2d3748);
+    border-bottom-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .file-name {
+    color: var(--text-primary-dark, #f7fafc);
+}
+
+[data-theme="dark"] .file-language {
+    background: var(--primary-800, #1a365d);
+    color: var(--primary-200, #90cdf4);
+}
+
+[data-theme="dark"] .code-editor-empty {
+    background: var(--bg-primary-dark, #1a202c);
+    border-color: var(--border-color-dark, #2d3748);
+}
+
+[data-theme="dark"] .empty-state h3 {
+    color: var(--text-primary-dark, #f7fafc);
+}
+
+[data-theme="dark"] .empty-state {
+    color: var(--text-secondary-dark, #a0aec0);
+}
+
+/* AI Status Styles */
+.ai-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-toggle {
+    background: none;
+    border: 1px solid var(--border-color, #e1e5e9);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-toggle.enabled {
+    background: var(--success-100, #dcfce7);
+    color: var(--success-700, #15803d);
+    border-color: var(--success-300, #86efac);
+}
+
+.ai-toggle.disabled {
+    background: var(--gray-100, #f3f4f6);
+    color: var(--gray-600, #6b7280);
+    border-color: var(--gray-300, #d1d5db);
+}
+
+.ai-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ai-status-loading {
+    font-size: 12px;
+    color: var(--text-secondary, #718096);
+    font-style: italic;
+}
+
+.ai-status-unavailable {
+    font-size: 12px;
+    color: var(--warning-600, #d97706);
+    opacity: 0.7;
+}
+
+/* Dark theme AI status */
+[data-theme="dark"] .ai-toggle {
+    border-color: var(--border-color-dark, #4a5568);
+}
+
+[data-theme="dark"] .ai-toggle.enabled {
+    background: var(--success-900, #14532d);
+    color: var(--success-300, #86efac);
+    border-color: var(--success-700, #15803d);
+}
+
+[data-theme="dark"] .ai-toggle.disabled {
+    background: var(--gray-800, #1f2937);
+    color: var(--gray-400, #9ca3af);
+    border-color: var(--gray-600, #4b5563);
+}
+
+[data-theme="dark"] .ai-status-loading {
+    color: var(--text-secondary-dark, #a0aec0);
+}
+
+[data-theme="dark"] .ai-status-unavailable {
+    color: var(--warning-400, #fbbf24);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .code-editor-header {
+        padding: 6px 12px;
+    }
+
+    .file-info {
+        gap: 8px;
+    }
+
+    .file-name {
+        font-size: 13px;
+    }
+
+    .file-language {
+        font-size: 11px;
+        padding: 1px 6px;
+    }
+
+    .ai-toggle {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .ai-status-loading,
+    .ai-status-unavailable {
+        font-size: 11px;
+    }
+}
