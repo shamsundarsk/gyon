@@ -1,0 +1,150 @@
+.ollama-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.ollama-status.loading {
+    background: var(--color-surface-hover);
+    color: var(--color-text-secondary);
+}
+
+.ollama-status.available {
+    background: var(--success-50);
+    color: var(--success-700);
+    border: 1px solid var(--success-200);
+}
+
+.ollama-status.unavailable {
+    background: var(--warning-50);
+    color: var(--warning-700);
+    border: 1px solid var(--warning-200);
+    cursor: pointer;
+}
+
+.ollama-status.unavailable:hover {
+    background: var(--warning-100);
+}
+
+.ollama-status.unavailable:hover .status-help {
+    display: block;
+}
+
+.status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-border);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.status-text {
+    white-space: nowrap;
+    flex: 1;
+}
+
+.status-refresh {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    opacity: 0.7;
+}
+
+.status-refresh:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.1);
+    opacity: 1;
+}
+
+.status-refresh:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.status-help {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--warning-200);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin-top: 4px;
+}
+
+.status-help p {
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.status-help ol {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--color-text-secondary);
+}
+
+.status-help li {
+    margin-bottom: 4px;
+}
+
+.status-help code {
+    background: var(--color-surface-hover);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.status-help a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.status-help a:hover {
+    text-decoration: underline;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ollama-status {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .status-help {
+        left: -50px;
+        right: -50px;
+    }
+}

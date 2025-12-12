@@ -1,0 +1,190 @@
+.code-preview {
+  background: #1a1f2e;
+  border-radius: 12px;
+  border: 1px solid rgba(46, 204, 112, 0.2);
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Tab Navigation */
+.preview-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(46, 204, 112, 0.2);
+}
+
+.preview-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #a0aec0;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.preview-tab:hover {
+  background: rgba(46, 204, 112, 0.1);
+  color: #ffffff;
+}
+
+.preview-tab.active {
+  background: rgba(46, 204, 112, 0.15);
+  color: #ffffff;
+  border-bottom-color: #2ecc70;
+}
+
+.preview-tab.active svg {
+  color: #2ecc70;
+}
+
+/* Tab Content */
+.preview-content {
+  padding: 32px;
+  min-height: 400px;
+}
+
+.tab-panel {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* File Structure */
+.file-structure {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.structure-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+}
+
+.structure-item:hover {
+  background: rgba(46, 204, 112, 0.1);
+}
+
+.structure-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.structure-name {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Code Display */
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.code-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.code-snippet {
+  background: #1a1a1a;
+  color: #2ecc70;
+  padding: 24px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.code-snippet code {
+  color: #e8e8e8;
+  white-space: pre;
+}
+
+/* Scrollbar Styling */
+.code-snippet::-webkit-scrollbar {
+  height: 8px;
+}
+
+.code-snippet::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.code-snippet::-webkit-scrollbar-thumb {
+  background: rgba(46, 204, 112, 0.5);
+  border-radius: 4px;
+}
+
+.code-snippet::-webkit-scrollbar-thumb:hover {
+  background: rgba(46, 204, 112, 0.7);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .preview-tabs {
+    flex-direction: column;
+  }
+
+  .preview-tab {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 3px solid transparent;
+  }
+
+  .preview-tab.active {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-left-color: #2ecc70;
+  }
+
+  .preview-content {
+    padding: 20px;
+  }
+
+  .code-snippet {
+    font-size: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .preview-content {
+    padding: 16px;
+  }
+
+  .preview-tab {
+    padding: 16px;
+    font-size: 14px;
+  }
+}
