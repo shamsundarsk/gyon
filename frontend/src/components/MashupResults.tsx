@@ -5,9 +5,11 @@ import IdeaDisplay from './IdeaDisplay';
 import CodePreview from './CodePreview';
 import UILayoutDisplay from './UILayoutDisplay';
 import DownloadButton from './DownloadButton';
+import OpenEditorButton from './OpenEditorButton';
 import RegenerateButton from './RegenerateButton';
 import { CustomGenerateButton } from './CustomGenerateButton';
 import { FAQ } from './FAQ';
+import { MonitorIcon, LightbulbIcon, ServerIcon, CodeIcon, PaletteIcon, HelpCircleIcon, ArrowLeftIcon } from './Icons';
 import './MashupResults.css';
 
 interface MashupResultsProps {
@@ -51,10 +53,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
           downloadSuccess={downloadSuccess}
         />
         {onOpenEditor && (
-          <button className="btn btn-primary open-editor-btn" onClick={onOpenEditor}>
-            <span className="btn-icon">💻</span>
-            Open in Editor
-          </button>
+          <OpenEditorButton onClick={onOpenEditor} />
         )}
         <RegenerateButton onClick={onRegenerate} />
         <CustomGenerateButton onGenerate={onCustomGenerate} />
@@ -63,7 +62,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
       {mashupData.idea.problemStatement && (
         <section className="problem-statement-section">
           <h2 className="section-heading">
-            <span className="heading-number">💡</span>
+            <LightbulbIcon size={24} color="#2ecc70" />
             Your Problem Statement
           </h2>
           <div className="problem-statement-card">
@@ -75,7 +74,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
 
       <section className="apis-section">
         <h2 className="section-heading">
-          <span className="heading-number">1</span>
+          <ServerIcon size={24} color="#2ecc70" />
           Selected APIs for Your Mashup
         </h2>
         <p className="section-description">
@@ -90,7 +89,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
 
       <section className="idea-section">
         <h2 className="section-heading">
-          <span className="heading-number">2</span>
+          <LightbulbIcon size={24} color="#2ecc70" />
           Your Project Concept
         </h2>
         <p className="section-description">
@@ -101,7 +100,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
 
       <section className="preview-section">
         <h2 className="section-heading">
-          <span className="heading-number">3</span>
+          <CodeIcon size={24} color="#2ecc70" />
           Code Preview
         </h2>
         <p className="section-description">
@@ -112,7 +111,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
 
       <section className="layout-section">
         <h2 className="section-heading">
-          <span className="heading-number">4</span>
+          <PaletteIcon size={24} color="#2ecc70" />
           UI Layout Suggestions
         </h2>
         <p className="section-description">
@@ -123,7 +122,7 @@ const MashupResults: React.FC<MashupResultsProps> = ({
 
       <section className="faq-section">
         <h2 className="section-heading">
-          <span className="heading-number">5</span>
+          <HelpCircleIcon size={24} color="#2ecc70" />
           Frequently Asked Questions
         </h2>
         <p className="section-description">

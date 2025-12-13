@@ -47,11 +47,11 @@ export const GenerationPage: React.FC<GenerationPageProps> = ({
       {/* Header */}
       <header className="generation-header-nav">
         <div className="header-content">
-          <div className="logo-section">
+          <div className="logo-section" onClick={onBack} style={{ cursor: 'pointer' }}>
             <div className="logo-icon">
-              <DiceIcon size={32} color="#2ecc70" />
+              🐢
             </div>
-            <h1 className="logo-title">API Roulette</h1>
+            <h1 className="logo-title">Gyon</h1>
           </div>
           <button className="back-button" onClick={onBack}>
             <ArrowLeftIcon size={20} />
