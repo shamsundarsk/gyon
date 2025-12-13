@@ -1,4 +1,4 @@
-these where the error from the console
+   these where the error from the console
 
 # Gyon
 
@@ -16,6 +16,24 @@ Perfect for developers, students, and hackathon participants who need rapid idea
 - 🔄 **Regeneration**: Don't like the result? Generate a new combination instantly
 - 🎭 **Mock Mode**: Gracefully handles APIs requiring authentication with sample data
 - 🤖 **AI Project Assistant**: Built-in chatbot to help with code understanding, debugging, and API integration
+
+## 📌 Existing Solutions vs Our MVP (API Roulette)
+
+1. *Existing tools solve only one part*  
+   Others handle APIs, ideas, or code separately.  
+   *Our MVP does everything end-to-end:* problem → APIs → idea → features → code → downloadable project.
+
+2. *Existing tools are single-user*  
+   Others don’t support team collaboration.  
+   *Our MVP has GCR:* join by link/code, real-time team chat, AI assisting everyone.
+
+3. *Existing tools don’t combine APIs intelligently*  
+   They list APIs, but users must figure out combinations.  
+   *Our MVP auto-mixes APIs* to generate new, meaningful, creative app ideas.
+
+4. *Existing tools generate text, not real projects*  
+   They give suggestions or partial code only.  
+   *Our MVP generates a full working project:* frontend, backend, UI layout, documentation — ready to run.
 
 ## Quick Start
 
