@@ -30,7 +30,10 @@ const config = getEnvConfig();
 const PORT = config.PORT;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -34,7 +34,7 @@ app.use('/api/mashup', mashupRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Mashup Maker API is running' });
+  res.json({ status: 'ok', message: 'Gyon API is running' });
 });
 
 // API Integration Point: Weather API

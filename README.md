@@ -1,6 +1,6 @@
 these where the error from the console
 
-# Mashup Maker
+# Gyon
 
 A developer tool that generates unique application concepts by randomly combining three APIs from a curated registry. The system produces complete app ideas with code scaffolding, UI layout suggestions, and downloadable starter projects.
 
@@ -29,7 +29,7 @@ Perfect for developers, students, and hackathon participants who need rapid idea
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd mashup-maker
+cd gyon
 ```
 
 2. Set up the backend:
@@ -56,7 +56,7 @@ The backend server will run on `http://localhost:3000`
 
 ## AI Project Assistant 🤖
 
-Mashup Maker includes an intelligent AI chatbot that helps you understand and work with your downloaded projects.
+Gyon includes an intelligent AI chatbot that helps you understand and work with your downloaded projects.
 
 ### Features
 
@@ -106,7 +106,7 @@ For instant answers without AI processing, use the quick help buttons:
 This is a monorepo containing both backend and frontend applications:
 
 ```
-mashup-maker/
+gyon/
 ├── backend/                    # Node.js/Express backend with TypeScript
 │   ├── src/
 │   │   ├── __tests__/         # Test files
@@ -585,7 +585,7 @@ npm run test:watch       # Run tests in watch mode
 
 **Test Structure:**
 - Unit tests: `backend/src/__tests__/*.test.ts`
-- Property-based tests: Tagged with `// Feature: mashup-maker, Property X: ...`
+- Property-based tests: Tagged with `// Feature: gyon, Property X: ...`
 - Each property test runs 100+ iterations with randomly generated inputs
 
 **Writing Tests:**
@@ -605,7 +605,7 @@ Property-based test example:
 ```typescript
 import fc from 'fast-check';
 
-// Feature: mashup-maker, Property 1: API Selection Constraints
+// Feature: gyon, Property 1: API Selection Constraints
 it('should always select exactly 3 unique APIs from different categories', () => {
   fc.assert(
     fc.property(
@@ -740,7 +740,7 @@ Enable detailed logging by setting environment variables:
 ```bash
 # Backend
 NODE_ENV=development
-DEBUG=mashup-maker:*
+DEBUG=gyon:*
 
 # Run with logging
 npm run dev

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Timeout Test</title>
+</head>
+
+<body>
+    <h1>API Timeout Test</h1>
+    <button onclick="testTimeout()">Test API with 2 Minute Timeout</button>
+    <div id="result"></div>
+    <div id="timer"></div>
+
+    <script>
+        async function testTimeout() {
+            const resultDiv = document.getElementById('result');
+            const timerDiv = document.getElementById('timer');
+            resultDiv.innerHTML = 'Testing API with 2 minute timeout...';
+
+            const startTime = Date.now();
+            const timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                timerDiv.innerHTML = `Elapsed: ${elapsed}s`;
+            }, 1000);
+
+            try {
+                const response = await fetch('http://localhost:3002/api/mashup/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        options: {}
+                    })
+                });
+
+                clearInterval(timer);
+                const data = await response.json();
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+
+                if (data.success) {
+                    resultDiv.innerHTML = `<h2>✅ SUCCESS!</h2><p>Generated: ${data.data.idea.appName}</p><p>Time: ${totalTime}s</p>`;
+                } else {
+                    resultDiv.innerHTML = `<h2>❌ API Error</h2><p>${data.error.message}</p><p>Time: ${totalTime}s</p>`;
+                }
+            } catch (error) {
+                clearInterval(timer);
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                resultDiv.innerHTML = `<h2>❌ Connection Error</h2><p>${error.message}</p><p>Time: ${totalTime}s</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

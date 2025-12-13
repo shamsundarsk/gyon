@@ -1,5 +1,5 @@
 /**
- * Custom error classes for Mashup Maker
+ * Custom error classes for Gyon
  * Provides specific error types for different failure scenarios
  * Validates: Requirement 6.4
  */

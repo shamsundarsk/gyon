@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Complete
 
-A fully functional, self-contained AI idea generator module has been added to API Roulette. This module uses Ollama (local LLM) to generate creative hackathon project ideas by combining random APIs.
+A fully functional, self-contained AI idea generator module has been added to Gyon. This module uses Ollama (local LLM) to generate creative hackathon project ideas by combining random APIs.
 
 ## 📦 What Was Built
 
@@ -148,7 +148,7 @@ npx ts-node src/modules/idea-generator/test-module.ts
 
 ```
 ┌────────────────────────────┐
-│ Main App (API Roulette)    │
+│ Main App (Gyon)           │
 │  • UI                      │
 │  • Routing                 │
 │  • User Flows              │
