@@ -1,0 +1,419 @@
+/* Turtle and Rabbit Racing Loading Animation */
+.turtle-rabbit-racing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(1, 8, 4, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.racing-container {
+    max-width: 600px;
+    width: 90%;
+    padding: 40px;
+    background: linear-gradient(135deg, #0a1f0f 0%, #051108 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(46, 204, 112, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.racing-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(46, 204, 112, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.racing-header {
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.racing-header h2 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.racing-header p {
+    color: #b3b3b3;
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Race Track */
+.race-track {
+    position: relative;
+    height: 120px;
+    margin: 30px 0;
+    background: linear-gradient(to bottom, #2d5a3d 0%, #1a3d26 50%, #0f2419 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(46, 204, 112, 0.3);
+    overflow: hidden;
+}
+
+.track-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.track-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: repeating-linear-gradient(to right,
+            #ffffff 0px,
+            #ffffff 20px,
+            transparent 20px,
+            transparent 40px);
+    transform: translateY(-50%);
+    opacity: 0.6;
+    animation: trackLineMove 2s linear infinite;
+}
+
+@keyframes trackLineMove {
+    0% {
+        background-position: 0px 0px;
+    }
+
+    100% {
+        background-position: 40px 0px;
+    }
+}
+
+.track-grass {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(46, 204, 112, 0.1) 2px, transparent 2px),
+        radial-gradient(circle at 80% 70%, rgba(46, 204, 112, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(46, 204, 112, 0.1) 1.5px, transparent 1.5px);
+    background-size: 50px 50px, 30px 30px, 40px 40px;
+    animation: grassSway 4s ease-in-out infinite;
+}
+
+@keyframes grassSway {
+
+    0%,
+    100% {
+        background-position: 0px 0px, 0px 0px, 0px 0px;
+    }
+
+    50% {
+        background-position: 5px 0px, -3px 0px, 2px 0px;
+    }
+}
+
+.finish-line {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+}
+
+.finish-flag {
+    font-size: 24px;
+    animation: flagWave 1s ease-in-out infinite alternate;
+}
+
+@keyframes flagWave {
+    0% {
+        transform: rotate(-5deg);
+    }
+
+    100% {
+        transform: rotate(5deg);
+    }
+}
+
+/* Racers */
+.racer {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease-out;
+    z-index: 2;
+}
+
+.racer-character {
+    font-size: 28px;
+    margin-bottom: 4px;
+    animation: bounce 0.6s ease-in-out infinite alternate;
+}
+
+.turtle .racer-character {
+    animation-duration: 1.2s;
+    /* Slower bounce for turtle */
+}
+
+.rabbit .racer-character {
+    animation-duration: 0.4s;
+    /* Faster bounce for rabbit */
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        transform: translateY(-8px);
+    }
+}
+
+.racer-label {
+    font-size: 10px;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.turtle {
+    top: 35%;
+}
+
+.rabbit {
+    top: 65%;
+}
+
+.turtle .racer-label {
+    background: rgba(46, 204, 112, 0.8);
+    color: #010804;
+}
+
+.rabbit .racer-label {
+    background: rgba(255, 193, 7, 0.8);
+    color: #010804;
+}
+
+/* Progress Dots */
+.progress-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 1;
+}
+
+.progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    background: #2ecc70;
+    box-shadow: 0 0 8px rgba(46, 204, 112, 0.6);
+    transform: scale(1.2);
+}
+
+/* Status Section */
+.racing-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0 20px 0;
+    padding: 15px 20px;
+    background: rgba(46, 204, 112, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(46, 204, 112, 0.2);
+}
+
+.status-message {
+    color: #2ecc70;
+    font-size: 14px;
+    font-weight: 500;
+    animation: messageGlow 2s ease-in-out infinite;
+}
+
+@keyframes messageGlow {
+
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(46, 204, 112, 0.5);
+    }
+}
+
+.progress-percentage {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+/* Fun Facts */
+.racing-facts {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    gap: 20px;
+}
+
+.fact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b3b3b3;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1;
+    justify-content: center;
+}
+
+.fact-icon {
+    font-size: 14px;
+}
+
+/* Loading Animation */
+.loading-animation {
+    margin-top: 30px;
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ecc70;
+    animation: loadingDots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loadingDots {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .racing-container {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .racing-header h2 {
+        font-size: 20px;
+    }
+
+    .racing-header p {
+        font-size: 14px;
+    }
+
+    .race-track {
+        height: 100px;
+    }
+
+    .racer-character {
+        font-size: 24px;
+    }
+
+    .racing-facts {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fact-item {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .racing-container {
+        padding: 20px 15px;
+    }
+
+    .racing-header h2 {
+        font-size: 18px;
+    }
+
+    .race-track {
+        height: 80px;
+    }
+
+    .racer-character {
+        font-size: 20px;
+    }
+
+    .racing-status {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}

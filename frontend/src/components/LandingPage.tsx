@@ -327,7 +327,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartBuilding, onOpe
               onClick={onStartBuilding}
               className="bg-primary hover:bg-[#25a25a] text-[#010804] text-lg font-bold py-4 px-12 rounded-full shadow-lg shadow-primary/20 transition transform hover:-translate-y-1"
             >
-              Install Gyon CLI
+              Start Building
             </button>
             <button 
               onClick={() => window.open('https://github.com', '_blank')}

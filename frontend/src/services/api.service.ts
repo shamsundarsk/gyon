@@ -5,9 +5,11 @@ import type {
 } from '../types';
 
 /**
- * Base URL for API requests - Direct connection to backend
+ * Base URL for API requests - Works for both local and production
  */
-const API_BASE_URL = 'http://localhost:3002/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'; // Use relative path for production (handled by Vercel rewrites)
 
 /**
  * Axios instance with base configuration

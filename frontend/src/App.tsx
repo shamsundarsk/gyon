@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import {
-  LoadingSpinner,
   MashupResults,
   CodeEditorPage,
 } from './components';
@@ -11,6 +10,7 @@ import { GenerationPage } from './components/GenerationPage';
 import { LandingPage } from './components/LandingPage';
 import { BrainstormModal } from './components/BrainstormModal';
 import { BrainstormChat } from './components/BrainstormChat';
+import { TurtleRabbitRacing } from './components/TurtleRabbitRacing';
 
 import { UserPreferencesPanel } from './components/UserPreferencesPanel';
 import { OnboardingTour, useOnboarding } from './components/OnboardingTour';
@@ -358,14 +358,13 @@ function App() {
         </div>
       )}
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-deep-bg/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      )}
+      {/* Loading State with Turtle and Rabbit Racing */}
+      <TurtleRabbitRacing isVisible={isLoading} />
 
-      <LandingPage onStartBuilding={handleStartJourney} onOpenBrainstorm={handleOpenBrainstorm} />
+      <LandingPage 
+        onStartBuilding={handleStartJourney} 
+        onOpenBrainstorm={handleOpenBrainstorm} 
+      />
 
       <BrainstormModal
         isOpen={isBrainstormModalOpen}

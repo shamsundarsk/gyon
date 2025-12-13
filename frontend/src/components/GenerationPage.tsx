@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ProblemStatementInput } from './ProblemStatementInput';
-import { DiceIcon, LightbulbIcon, ArrowLeftIcon, SparklesIcon } from './Icons';
+import { DiceIcon, LightbulbIcon, ArrowLeftIcon } from './Icons';
+import { TurtleRabbitRacing } from './TurtleRabbitRacing';
 import './GenerationPage.css';
 
 interface GenerationPageProps {
@@ -29,15 +30,11 @@ export const GenerationPage: React.FC<GenerationPageProps> = ({
   if (isLoading) {
     return (
       <div className="generation-page">
-        <div className="generation-container">
-          <div className="loading-state">
-            <div className="loading-spinner">
-              <SparklesIcon size={48} color="#2ecc70" />
-            </div>
-            <h2>Generating Your Perfect API Combination...</h2>
-            <p>Our AI is analyzing thousands of possibilities to create something amazing for you.</p>
-          </div>
-        </div>
+        <TurtleRabbitRacing 
+          isVisible={isLoading}
+          title="Generating Your Perfect API Combination..."
+          subtitle="Our AI is analyzing thousands of possibilities to create something amazing for you."
+        />
       </div>
     );
   }

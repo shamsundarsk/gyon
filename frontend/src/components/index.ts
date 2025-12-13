@@ -24,5 +24,6 @@ export { OnboardingTour, useOnboarding } from './OnboardingTour';
 export { BrainstormModal } from './BrainstormModal';
 export { BrainstormChat } from './BrainstormChat';
 export { LandingPage } from './LandingPage';
+export { TurtleRabbitRacing } from './TurtleRabbitRacing';
 export { default as OpenEditorButton } from './OpenEditorButton';
 export { default as LivePreview } from './LivePreview';
