@@ -39,13 +39,7 @@ describe('Code Execution Integration Tests', () => {
     path: 'test.ts'
   };
 
-  const sampleHTMLFile: CodeFile = {
-    id: 'test-html',
-    name: 'index.html',
-    content: '<html><body><h1>Hello World</h1></body></html>',
-    language: 'html',
-    path: 'index.html'
-  };
+
 
   beforeEach(() => {
     vi.clearAllMocks();

@@ -674,7 +674,7 @@ ${mashupData.idea.apis.map(api => `- \`GET /api/${api.name.toLowerCase()}\` - ${
 
 ## Development
 
-This project was generated using the API Mashup Generator. You can modify the code to suit your needs.
+This project was generated using Gyon. You can modify the code to suit your needs.
 
 ## License
 

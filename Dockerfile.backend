@@ -1,0 +1,31 @@
+# Backend Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY backend/package*.json ./
+RUN npm ci --only=production
+
+# Copy source code
+COPY backend/ ./
+
+# Build the application
+RUN npm run build
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S gyon -u 1001
+
+# Change ownership
+RUN chown -R gyon:nodejs /app
+USER gyon
+
+# Expose port
+EXPOSE 3002
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3002/api/health || exit 1
+
+CMD ["npm", "start"]

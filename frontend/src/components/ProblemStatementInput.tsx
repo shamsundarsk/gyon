@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import './ProblemStatementInput.css';
-import { LightbulbIcon, DiceIcon } from './Icons';
+import { LightbulbIcon, SendIcon, SparklesIcon } from './Icons';
 
 interface ProblemStatementInputProps {
   onGenerate: (problemStatement?: string) => void;
   isLoading: boolean;
-  placeholder?: string;
 }
 
-export function ProblemStatementInput({ onGenerate, isLoading, placeholder }: ProblemStatementInputProps) {
+export function ProblemStatementInput({ onGenerate, isLoading }: ProblemStatementInputProps) {
   const [problemStatement, setProblemStatement] = useState('');
   const [mode, setMode] = useState<'problem' | 'random'>('problem');
 
@@ -22,11 +21,12 @@ export function ProblemStatementInput({ onGenerate, isLoading, placeholder }: Pr
   };
 
   const exampleProblems = [
-    "I want to build a fitness tracking app that considers weather conditions",
-    "Create a social media app for sharing recipes with location-based recommendations",
-    "Build a productivity tool that combines task management with music for focus",
-    "Design a travel planning app that integrates weather, maps, and local events",
-    "Make a learning platform that gamifies education with progress tracking"
+    "Build a fitness app that tracks workouts and suggests exercises based on weather",
+    "Create a recipe sharing platform with location-based restaurant recommendations", 
+    "Design a productivity tool that combines task management with focus music",
+    "Make a travel planner that integrates weather, maps, and local events",
+    "Build a learning platform that gamifies education with progress tracking",
+    "Create a social media app for pet owners with veterinary appointment booking"
   ];
 
   const handleExampleClick = (example: string) => {
@@ -35,98 +35,71 @@ export function ProblemStatementInput({ onGenerate, isLoading, placeholder }: Pr
   };
 
   return (
-    <div className="problem-input-container">
-      <div className="mode-selector">
-        <button
-          type="button"
-          className={`mode-btn ${mode === 'problem' ? 'active' : ''}`}
-          onClick={() => setMode('problem')}
-        >
-          <LightbulbIcon size={20} />
-          Solve a Problem
-        </button>
-        <button
-          type="button"
-          className={`mode-btn ${mode === 'random' ? 'active' : ''}`}
-          onClick={() => setMode('random')}
-        >
-          <DiceIcon size={20} />
-          Random Inspiration
-        </button>
+    <div className="modern-chat-container">
+      {/* Header */}
+      <div className="chat-header">
+        <div className="chat-header-content">
+          <div className="chat-icon">
+            <SparklesIcon size={24} color="#2ecc70" />
+          </div>
+          <div>
+            <h2 className="chat-title">Describe Your Idea</h2>
+            <p className="chat-subtitle">Tell us what you want to build, and we'll find the perfect APIs</p>
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="problem-form">
-        {mode === 'problem' ? (
-          <div className="problem-input-section">
-            <label htmlFor="problemStatement" className="problem-label">
-              What do you want to build? Describe your project idea or problem to solve:
-            </label>
-            <textarea
-              id="problemStatement"
-              value={problemStatement}
-              onChange={(e) => setProblemStatement(e.target.value)}
-              placeholder={placeholder || "e.g., I want to build a fitness app that tracks workouts and suggests exercises based on weather conditions..."}
-              className="problem-textarea"
-              rows={4}
-              minLength={10}
-              maxLength={1000}
-              required
-            />
-            <div className="character-count">
-              {problemStatement.length}/1000 characters
-            </div>
-            
-            <div className="examples-section">
-              <p className="examples-title">Need inspiration? Try these examples:</p>
-              <div className="examples-grid">
-                {exampleProblems.map((example, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className="example-btn"
-                    onClick={() => handleExampleClick(example)}
-                  >
-                    {example}
-                  </button>
-                ))}
+      {/* Suggestions Grid */}
+      <div className="suggestions-container">
+        <div className="suggestions-grid">
+          {exampleProblems.map((example, index) => (
+            <button
+              key={index}
+              type="button"
+              className="suggestion-card"
+              onClick={() => handleExampleClick(example)}
+            >
+              <div className="suggestion-icon">
+                <LightbulbIcon size={20} color="#2ecc70" />
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="random-mode-section">
-            <div className="random-description">
-              <LightbulbIcon size={48} color="var(--primary-500)" />
-              <h3>Random API Combination</h3>
-              <p>
-                Let our system surprise you! We'll randomly select 3 APIs from different 
-                categories and generate a creative app idea for you to explore.
-              </p>
-            </div>
-          </div>
-        )}
+              <span className="suggestion-text">{example}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
-        <button
-          type="submit"
-          className={`generate-btn ${isLoading ? 'loading' : ''}`}
-          disabled={isLoading || (mode === 'problem' && problemStatement.trim().length < 10)}
-        >
-          {isLoading ? (
-            <>
-              <div className="spinner" />
-              Generating...
-            </>
-          ) : mode === 'problem' ? (
-            <>
-              <LightbulbIcon size={20} />
-              Generate Solution
-            </>
-          ) : (
-            <>
-              <DiceIcon size={20} />
-              Generate Random Mashup
-            </>
-          )}
-        </button>
+      {/* Chat Input */}
+      <form onSubmit={handleSubmit} className="chat-input-form">
+        <div className="chat-input-container">
+          <textarea
+            value={problemStatement}
+            onChange={(e) => setProblemStatement(e.target.value)}
+            placeholder="Describe your project idea... (e.g., I want to build a fitness app that tracks workouts and suggests exercises based on weather)"
+            className="chat-textarea"
+            rows={1}
+            maxLength={1000}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = 'auto';
+              target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+            }}
+          />
+          <button
+            type="submit"
+            className={`chat-send-btn ${problemStatement.trim().length >= 10 ? 'active' : ''}`}
+            disabled={isLoading || problemStatement.trim().length < 10}
+          >
+            {isLoading ? (
+              <div className="loading-spinner-small" />
+            ) : (
+              <SendIcon size={20} />
+            )}
+          </button>
+        </div>
+        <div className="chat-input-footer">
+          <span className="character-count">{problemStatement.length}/1000</span>
+          <span className="input-hint">Press Enter to generate • Minimum 10 characters</span>
+        </div>
       </form>
     </div>
   );

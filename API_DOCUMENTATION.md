@@ -1,6 +1,6 @@
-# Mashup Maker API Documentation
+# Gyon API Documentation
 
-Complete API reference for the Mashup Maker backend service.
+Complete API reference for the Gyon backend service.
 
 ## Base URL
 

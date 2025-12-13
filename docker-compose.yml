@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: gyon-backend
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - CORS_ORIGIN=http://localhost
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=llama3
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - ollama
+    networks:
+      - gyon-network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: gyon-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - gyon-network
+    restart: unless-stopped
+
+  # Ollama AI Service (Optional)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: gyon-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - gyon-network
+    restart: unless-stopped
+    # Uncomment if you have GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama-data:
+
+networks:
+  gyon-network:
+    driver: bridge

@@ -3,19 +3,20 @@ import type {
   MashupResponse,
   APIMetadata,
 } from '../types';
-import { getEnvConfig } from '../utils/validateEnv';
 
 /**
- * Base URL for API requests, configured from environment variables
+ * Base URL for API requests - Works for both local and production
  */
-const API_BASE_URL = getEnvConfig().VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'; // Use relative path for production (handled by Vercel rewrites)
 
 /**
  * Axios instance with base configuration
  */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 second timeout for generation
+  timeout: 120000, // Increased to 2 minutes for AI processing
   headers: {
     'Content-Type': 'application/json',
   },
@@ -62,6 +63,8 @@ export class APIError extends Error {
  * Handle API errors and convert to APIError
  */
 function handleAPIError(error: unknown): never {
+  console.error('❌ API Error:', error);
+  
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<APIResponse<any>>;
     
@@ -80,7 +83,7 @@ function handleAPIError(error: unknown): never {
     
     if (axiosError.request) {
       throw new APIError(
-        'No response from server. Please check your connection.',
+        'Backend server is not responding. Please ensure the backend is running on port 3002.',
         'NETWORK_ERROR'
       );
     }
@@ -94,19 +97,19 @@ function handleAPIError(error: unknown): never {
 
 /**
  * Generate a new mashup with three random APIs
- * 
- * @param options - Optional generation parameters
- * @returns Promise resolving to mashup response
- * @throws APIError if generation fails
  */
 export async function generateMashup(
   options?: GenerateMashupOptions
 ): Promise<MashupResponse> {
   try {
+    console.log('🚀 Generating mashup with options:', options);
+    
     const response = await apiClient.post<APIResponse<MashupResponse>>(
       '/mashup/generate',
       { options }
     );
+    
+    console.log('✅ Mashup generated successfully');
     
     if (!response.data.success) {
       throw new APIError(
@@ -124,18 +127,11 @@ export async function generateMashup(
 
 /**
  * Download the ZIP archive for a generated mashup
- * 
- * @param downloadUrl - The download URL from the mashup response (e.g., "/api/mashup/download/filename.zip")
- * @returns Promise resolving to blob data
- * @throws APIError if download fails
  */
 export async function downloadMashup(downloadUrl: string): Promise<Blob> {
   try {
-    // Extract the path after /api/ since our base URL already includes /api
-    // downloadUrl format: "/api/mashup/download/filename.zip"
-    // We need to remove "/api" to get: "/mashup/download/filename.zip"
     const path = downloadUrl.startsWith('/api/') 
-      ? downloadUrl.substring(4)  // Remove "/api" (4 characters, not 5)
+      ? downloadUrl.substring(4)
       : downloadUrl;
     
     const response = await apiClient.get(path, {
@@ -150,10 +146,6 @@ export async function downloadMashup(downloadUrl: string): Promise<Blob> {
 
 /**
  * Retrieve all APIs from the registry
- * 
- * @param filters - Optional filters for category and auth type
- * @returns Promise resolving to array of API metadata
- * @throws APIError if retrieval fails
  */
 export async function getAPIs(filters?: {
   category?: string;
@@ -191,9 +183,6 @@ export async function getAPIs(filters?: {
 
 /**
  * Trigger browser download for a blob
- * 
- * @param blob - The blob data to download
- * @param filename - The filename for the download
  */
 export function triggerBrowserDownload(blob: Blob, filename: string): void {
   const url = window.URL.createObjectURL(blob);

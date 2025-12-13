@@ -38,18 +38,30 @@ export class IdeaGenerator {
       let rationale: string;
 
       if (shouldUseOllama && problemStatement) {
-        // Use AI-enhanced generation for problem-driven requests
-        const aiEnhanced = await this.generateWithOllama(apis, problemStatement);
-        appName = aiEnhanced.appName;
-        description = aiEnhanced.description;
-        features = aiEnhanced.features;
-        rationale = aiEnhanced.rationale;
-        
-        logger.logInfo('AI-enhanced idea generated successfully', { 
-          appName, 
-          usedOllama: true,
-          hasProblemStatement: true 
-        });
+        try {
+          // Use AI-enhanced generation for problem-driven requests
+          const aiEnhanced = await this.generateWithOllama(apis, problemStatement);
+          appName = aiEnhanced.appName;
+          description = aiEnhanced.description;
+          features = aiEnhanced.features;
+          rationale = aiEnhanced.rationale;
+          
+          logger.logInfo('AI-enhanced idea generated successfully', { 
+            appName, 
+            usedOllama: true,
+            hasProblemStatement: true 
+          });
+        } catch (ollamaError) {
+          // Fallback to template-based generation if Ollama fails
+          logger.logWarning('Ollama generation failed, falling back to template-based generation', { 
+            error: ollamaError instanceof Error ? ollamaError.message : 'Unknown error' 
+          });
+          
+          appName = this.generateAppNameFromProblem(apis, problemStatement);
+          description = this.generateDescriptionFromProblem(apis, problemStatement);
+          features = this.generateFeaturesFromProblem(apis, problemStatement);
+          rationale = this.generateRationaleFromProblem(apis, problemStatement);
+        }
       } else {
         // Use template-based generation (fallback or random mode)
         appName = problemStatement 

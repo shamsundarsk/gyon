@@ -56,7 +56,7 @@ export class AIChatbotService {
    * Generate a system prompt based on project context
    */
   private generateSystemPrompt(projectContext?: MashupResponse): string {
-    let systemPrompt = `You are an expert AI assistant specialized in helping developers with API Roulette projects. 
+    let systemPrompt = `You are an expert AI assistant specialized in helping developers with Gyon projects. 
 
 Your expertise includes:
 - Full-stack development (Node.js/Express backend, React frontend)

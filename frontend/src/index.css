@@ -1,47 +1,220 @@
-@import './styles/design-tokens.css';
-@import './styles/components.css';
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
-    /* Color palette */
-    --primary-gradient-start: #667eea;
-    --primary-gradient-end: #764ba2;
-    --background-light: #f5f7fa;
-    --background-gradient-end: #c3cfe2;
-    --text-primary: #2d3748;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --border-color: #e2e8f0;
-    --white: #ffffff;
-    --success: #10b981;
-    --error: #c53030;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 6px 20px rgba(102, 126, 234, 0.6);
-}
-
-* {
-    box-sizing: border-box;
+    /* Color Variables */
+    --primary: #2ecc70;
+    --accent: #3b82f6;
+    --deep-bg: #010804;
+    --surface-dark: #05110a;
 }
 
 body {
+    background-color: #010804;
+    color: #cbd5e1;
     margin: 0;
-    padding: 0;
-    min-width: 320px;
     min-height: 100vh;
-    color: var(--text-primary);
-    background-color: var(--background-light);
 }
 
-#root {
-    width: 100%;
-    min-height: 100vh;
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #010804;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #132e21;
+    border-radius: 4px;
+    border: 1px solid #05110a;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2ecc70;
+}
+
+.code-syntax-blue {
+    color: #60a5fa;
+}
+
+.code-syntax-green {
+    color: #2ecc70;
+}
+
+.code-syntax-purple {
+    color: #c084fc;
+}
+
+.code-syntax-gray {
+    color: #475569;
+}
+
+.glass-panel {
+    background: rgba(5, 17, 10, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(46, 204, 112, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.bg-grid {
+    background-size: 50px 50px;
+    background-image:
+        linear-gradient(to right, rgba(46, 204, 112, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(46, 204, 112, 0.03) 1px, transparent 1px);
+}
+
+.neon-border-hover:hover {
+    box-shadow: 0 0 15px rgba(46, 204, 112, 0.3), inset 0 0 10px rgba(46, 204, 112, 0.1);
+    border-color: rgba(46, 204, 112, 0.5);
+}
+
+.text-gradient-primary {
+    background: linear-gradient(135deg, #ffffff 0%, #2ecc70 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Animation keyframes */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(200%);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
+/* Utility classes for colors */
+.bg-deep-bg {
+    background-color: var(--deep-bg);
+}
+
+.bg-surface-dark {
+    background-color: var(--surface-dark);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+.border-primary {
+    border-color: var(--primary);
+}
+
+/* Brainstorm message styling */
+.brainstorm-message {
+    color: white !important;
+}
+
+.brainstorm-message * {
+    color: inherit !important;
+}
+
+.brainstorm-message strong {
+    font-weight: 700 !important;
+    color: inherit !important;
+}
+
+.brainstorm-message em {
+    font-style: italic !important;
+    color: inherit !important;
+}
+
+.brainstorm-message code {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    color: #2ecc70 !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: 'Fira Code', monospace !important;
+    font-size: 0.9em !important;
+}
+
+.brainstorm-message pre {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    color: #2ecc70 !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    font-family: 'Fira Code', monospace !important;
+    font-size: 0.9em !important;
+    overflow-x: auto !important;
+    white-space: pre-wrap !important;
+}
+
+.brainstorm-message h1,
+.brainstorm-message h2,
+.brainstorm-message h3,
+.brainstorm-message h4,
+.brainstorm-message h5,
+.brainstorm-message h6 {
+    color: inherit !important;
+    font-weight: 600 !important;
+    margin: 0.5em 0 !important;
+}
+
+.brainstorm-message p {
+    color: inherit !important;
+    margin: 0.5em 0 !important;
+}
+
+.brainstorm-message ul,
+.brainstorm-message ol {
+    color: inherit !important;
+    margin: 0.5em 0 !important;
+    padding-left: 1.5em !important;
+}
+
+.brainstorm-message li {
+    color: inherit !important;
+    margin: 0.25em 0 !important;
 }

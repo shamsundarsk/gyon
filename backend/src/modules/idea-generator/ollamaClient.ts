@@ -36,6 +36,10 @@ export async function generate(
   const endpoint = `${ollamaUrl}/api/generate`;
 
   try {
+    // Add timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -50,7 +54,10 @@ export async function generate(
           num_predict: max_tokens,
         },
       }),
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
@@ -60,6 +67,9 @@ export async function generate(
     return data.response.trim();
   } catch (error) {
     if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Ollama request timed out after 30 seconds');
+      }
       if (error.message.includes('ECONNREFUSED') || error.message.includes('fetch failed')) {
         throw new Error(
           'Could not connect to Ollama. Make sure Ollama is running at ' + ollamaUrl

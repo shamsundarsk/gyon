@@ -1,6 +1,6 @@
-# Contributing to Mashup Maker
+# Contributing to Gyon
 
-Thank you for your interest in contributing to Mashup Maker! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to Gyon! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
 
@@ -43,13 +43,13 @@ Thank you for your interest in contributing to Mashup Maker! This document provi
 1. Fork the repository on GitHub
 2. Clone your fork locally:
 ```bash
-git clone https://github.com/YOUR_USERNAME/mashup-maker.git
-cd mashup-maker
+git clone https://github.com/YOUR_USERNAME/gyon.git
+cd gyon
 ```
 
 3. Add the upstream repository:
 ```bash
-git remote add upstream https://github.com/ORIGINAL_OWNER/mashup-maker.git
+git remote add upstream https://github.com/ORIGINAL_OWNER/gyon.git
 ```
 
 ### Install Dependencies
@@ -286,7 +286,7 @@ Use fast-check for property-based testing:
 ```typescript
 import fc from 'fast-check';
 
-// Feature: mashup-maker, Property 1: API Selection Constraints
+// Feature: gyon, Property 1: API Selection Constraints
 it('should always select unique APIs from different categories', () => {
   fc.assert(
     fc.property(
@@ -475,4 +475,4 @@ Contributors will be recognized in:
 - Release notes
 - Project documentation
 
-Thank you for contributing to Mashup Maker! 🎉
+Thank you for contributing to Gyon! 🎉
