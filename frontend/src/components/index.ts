@@ -21,3 +21,7 @@ export { default as CodeEditorPage } from './CodeEditorPage';
 export { ThemeToggle } from './ThemeToggle';
 export { UserPreferencesPanel } from './UserPreferencesPanel';
 export { OnboardingTour, useOnboarding } from './OnboardingTour';
+export { BrainstormModal } from './BrainstormModal';
+export { BrainstormChat } from './BrainstormChat';
+export { LandingPage } from './LandingPage';
+export { default as OpenEditorButton } from './OpenEditorButton';
