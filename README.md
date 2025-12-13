@@ -1,5 +1,3 @@
-   these where the error from the console
-
 # Gyon
 
 A developer tool that generates unique application concepts by randomly combining three APIs from a curated registry. The system produces complete app ideas with code scaffolding, UI layout suggestions, and downloadable starter projects.
