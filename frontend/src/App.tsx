@@ -8,11 +8,14 @@ import {
 import { FAQ } from './components/FAQ';
 import { AIChatbot } from './components/AIChatbot';
 import { GenerationPage } from './components/GenerationPage';
+import { LandingPage } from './components/LandingPage';
+import { BrainstormModal } from './components/BrainstormModal';
+import { BrainstormChat } from './components/BrainstormChat';
 import { OllamaStatus } from './components/OllamaStatus';
 import { ThemeToggle } from './components/ThemeToggle';
 import { UserPreferencesPanel } from './components/UserPreferencesPanel';
 import { OnboardingTour, useOnboarding } from './components/OnboardingTour';
-import { DiceIcon, LightbulbIcon, CompassIcon, RocketIcon, AlertIcon, RobotIcon } from './components/Icons';
+import { DiceIcon, AlertIcon, RobotIcon, BrainIcon, UserIcon, HelpCircleIcon } from './components/Icons';
 import { useMashup } from './context';
 import { performanceOptimizer } from './services/PerformanceOptimizer';
 import { userPreferencesService } from './services/UserPreferencesService';
@@ -37,6 +40,8 @@ function App() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(!hasSeenOnboarding);
+  const [isBrainstormModalOpen, setIsBrainstormModalOpen] = useState(false);
+  const [brainstormRoomCode, setBrainstormRoomCode] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<'landing' | 'generate' | 'results' | 'editor'>('landing');
 
   // Initialize performance optimization
@@ -58,6 +63,19 @@ function App() {
     // Apply font preferences
     document.documentElement.style.setProperty('--editor-font-family', preferences.fontFamily);
     document.documentElement.style.setProperty('--editor-font-size', `${preferences.fontSize}px`);
+  }, []);
+
+  // Handle URL-based room joining
+  useEffect(() => {
+    const path = window.location.pathname;
+    const brainstormMatch = path.match(/^\/brainstorm\/([A-Z0-9]{6})$/);
+    
+    if (brainstormMatch) {
+      const roomCode = brainstormMatch[1];
+      setBrainstormRoomCode(roomCode);
+      // Update URL to clean path
+      window.history.replaceState({}, '', '/');
+    }
   }, []);
 
   const handleGenerate = (problemStatement?: string) => {
@@ -103,9 +121,26 @@ function App() {
     setIsOnboardingOpen(true);
   };
 
-  const scrollToFeatures = (e: React.MouseEvent) => {
-    e.preventDefault();
-    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  const handleOpenBrainstorm = () => {
+    setIsBrainstormModalOpen(true);
+  };
+
+  const handleCloseBrainstormModal = () => {
+    setIsBrainstormModalOpen(false);
+  };
+
+  const handleCreateBrainstormChat = (roomCode: string) => {
+    setBrainstormRoomCode(roomCode);
+    setIsBrainstormModalOpen(false);
+  };
+
+  const handleJoinBrainstormChat = (roomCode: string) => {
+    setBrainstormRoomCode(roomCode);
+    setIsBrainstormModalOpen(false);
+  };
+
+  const handleCloseBrainstormChat = () => {
+    setBrainstormRoomCode(null);
   };
 
   // Show code editor page
@@ -126,28 +161,55 @@ function App() {
       <div className="app">
         <header className="app-header">
           <div className="header-content">
-            <div className="logo-section">
+            <div className="logo-section" onClick={handleBackToLanding} style={{ cursor: 'pointer' }}>
               <div className="logo-icon">
-                <DiceIcon size={32} color="#2ecc70" />
+                🐢
               </div>
-              <h1 className="logo-title">API Roulette</h1>
+              <h1 className="logo-title">Gyon</h1>
             </div>
             <div className="header-nav">
-              <OllamaStatus />
-              <ThemeToggle />
+              <button 
+                className="brainstorm-btn"
+                onClick={handleOpenBrainstorm}
+                title="Enhanced Brainstorm"
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: 'rgba(46, 204, 112, 0.1)',
+                  border: '1px solid rgba(46, 204, 112, 0.3)',
+                  borderRadius: '8px',
+                  color: '#2ecc70',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(46, 204, 112, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(46, 204, 112, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <BrainIcon size={16} />
+                Brainstorm
+              </button>
               <button 
                 className="preferences-btn"
                 onClick={() => setIsPreferencesOpen(true)}
                 title="User Preferences"
               >
-                ⚙️
+                <UserIcon size={18} />
               </button>
               <button 
                 className="help-btn"
                 onClick={handleShowOnboarding}
                 title="Show Help Tour"
               >
-                ❓
+                <HelpCircleIcon size={18} />
               </button>
               <button 
                 className="faq-btn"
@@ -182,6 +244,7 @@ function App() {
               onRegenerate={handleRegenerate}
               onCustomGenerate={handleCustomGenerate}
               onOpenEditor={handleOpenEditor}
+              onBack={handleBackToLanding}
               isDownloading={isDownloading}
               downloadSuccess={downloadSuccess}
             />
@@ -208,6 +271,20 @@ function App() {
           onClose={() => setIsOnboardingOpen(false)}
           onComplete={handleOnboardingComplete}
         />
+
+        <BrainstormModal
+          isOpen={isBrainstormModalOpen}
+          onClose={handleCloseBrainstormModal}
+          onCreateChat={handleCreateBrainstormChat}
+          onJoinChat={handleJoinBrainstormChat}
+        />
+
+        {brainstormRoomCode && (
+          <BrainstormChat
+            roomCode={brainstormRoomCode}
+            onClose={handleCloseBrainstormChat}
+          />
+        )}
 
         {!isChatbotOpen && (
           <button 
@@ -269,170 +346,41 @@ function App() {
   // Show landing page
   return (
     <div className="app">
-      {/* Header */}
-      <header className="app-header">
-        <div className="header-content">
-          <div className="logo-section">
-            <div className="logo-icon">
-              <DiceIcon size={40} color="var(--primary-500)" />
-            </div>
-            <h1 className="logo-title">API Roulette</h1>
-          </div>
-          <div className="header-nav">
-            <nav className="nav-links">
-              <a href="#features" className="nav-link" onClick={scrollToFeatures}>Features</a>
-              <a href="#how-it-works" className="nav-link" onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-              }}>How It Works</a>
-              <a href="#contact" className="nav-link" onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' });
-              }}>Contact</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
       {/* Error Alert */}
       {error && (
-        <div className="alert alert-error animate-slideDown" style={{ maxWidth: '1400px', margin: '0 auto 32px', padding: '0 40px' }}>
-          <span className="alert-icon">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-3 rounded-lg backdrop-blur-md">
+          <div className="flex items-center gap-3">
             <AlertIcon size={20} />
-          </span>
-          <div className="alert-content">
-            <p className="alert-message">{error}</p>
-          </div>
-          <button className="btn btn-ghost btn-sm" onClick={clearError}>
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      {/* Hero Section */}
-      {!isLoading && (
-        <section className="hero-section">
-          <div className="hero-content">
-            <h1 className="hero-title">Build Your Next Great Idea</h1>
-            <p className="hero-description">
-              Discover the perfect API combinations for your hackathon project. Whether you have a specific idea or want to explore random possibilities, we'll help you create something amazing.
-            </p>
-            <button 
-              className="btn btn-primary btn-hero"
-              onClick={handleStartJourney}
-            >
-              <RocketIcon size={24} />
-              Start the Hackathon Journey
+            <span>{error}</span>
+            <button onClick={clearError} className="ml-4 text-red-400 hover:text-white">
+              ✕
             </button>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Loading State */}
       {isLoading && (
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '80px 40px' }}>
+        <div className="fixed inset-0 bg-deep-bg/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <LoadingSpinner />
         </div>
       )}
 
-      {/* Features Section */}
-      {!isLoading && (
-        <section id="features" className="features-section">
-          <div className="features-header">
-            <h2 className="features-title">How It Works</h2>
-            <p className="features-description">
-              Discover endless possibilities by instantly generating unique combinations of APIs for your next project. Our platform simplifies the brainstorming process, helping you find the perfect stack to build innovative applications.
-            </p>
-          </div>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">
-                <LightbulbIcon size={32} />
-              </div>
-              <h3 className="feature-title">Instant Inspiration</h3>
-              <p className="feature-description">
-                Get a random combination of three powerful APIs to kickstart your creativity.
-              </p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <CompassIcon size={32} />
-              </div>
-              <h3 className="feature-title">Discover New APIs</h3>
-              <p className="feature-description">
-                Explore a curated list of popular and niche APIs you might not have known about.
-              </p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <RocketIcon size={32} />
-              </div>
-              <h3 className="feature-title">Build Faster</h3>
-              <p className="feature-description">
-                Focus on building, not on endless brainstorming. Get your project off the ground in minutes.
-              </p>
-            </div>
-          </div>
-        </section>
+      <LandingPage onStartBuilding={handleStartJourney} onOpenBrainstorm={handleOpenBrainstorm} />
+
+      <BrainstormModal
+        isOpen={isBrainstormModalOpen}
+        onClose={handleCloseBrainstormModal}
+        onCreateChat={handleCreateBrainstormChat}
+        onJoinChat={handleJoinBrainstormChat}
+      />
+
+      {brainstormRoomCode && (
+        <BrainstormChat
+          roomCode={brainstormRoomCode}
+          onClose={handleCloseBrainstormChat}
+        />
       )}
-
-
-
-      {/* Footer */}
-      <footer id="footer" className="app-footer">
-        <div className="footer-content">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <div className="footer-logo">
-                <DiceIcon size={32} color="#2ecc70" />
-                <span className="footer-brand-name">API Roulette</span>
-              </div>
-              <p className="footer-tagline">
-                Spark innovation by combining powerful APIs into unique hackathon projects.
-              </p>
-            </div>
-            
-            <div className="footer-links-grid">
-              <div className="footer-column">
-                <h4 className="footer-column-title">Product</h4>
-                <a href="#features" className="footer-link">Features</a>
-                <a href="#how-it-works" className="footer-link">How It Works</a>
-                <a href="#" className="footer-link">API Registry</a>
-              </div>
-              
-              <div className="footer-column">
-                <h4 className="footer-column-title">Resources</h4>
-                <a href="#" className="footer-link">Documentation</a>
-                <a href="#" className="footer-link">API Guide</a>
-                <a href="#" className="footer-link">Blog</a>
-              </div>
-              
-              <div className="footer-column">
-                <h4 className="footer-column-title">Contact</h4>
-                <a href="mailto:contact@porygon.dev" className="footer-link">contact@porygon.dev</a>
-                <a href="#" className="footer-link">Support</a>
-                <a href="#" className="footer-link">Feedback</a>
-              </div>
-            </div>
-          </div>
-          
-          <div className="footer-bottom">
-            <div className="footer-legal">
-              <p className="footer-copyright">
-                © 2024 Porygon. All rights reserved.
-              </p>
-              <p className="footer-creator">
-                Created by <span className="creator-name">Porygon</span>
-              </p>
-            </div>
-            <div className="footer-legal-links">
-              <a href="#privacy" className="footer-legal-link">Privacy Policy</a>
-              <span className="footer-separator">•</span>
-              <a href="#terms" className="footer-legal-link">Terms of Service</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
