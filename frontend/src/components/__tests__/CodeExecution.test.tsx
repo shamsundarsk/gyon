@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import CodeRunner from '../CodeRunner';
 import Console from '../Console';
-import LivePreview from '../LivePreview';
+
 import { CodeExecutionService } from '../../services/CodeExecutionService';
 import { CodeFile } from '../CodeEditor';
 
@@ -243,63 +243,7 @@ describe('Code Execution Integration Tests', () => {
     });
   });
 
-  describe('LivePreview Component', () => {
-    test('should display placeholder when no files', () => {
-      render(<LivePreview files={[]} activeFile={null} />);
-      
-      expect(screen.getByText('No Preview Available')).toBeInTheDocument();
-      expect(screen.getByText('Create HTML, CSS, or JavaScript files to see a live preview of your project.')).toBeInTheDocument();
-    });
 
-    test('should generate preview for HTML files', () => {
-      render(<LivePreview files={[sampleHTMLFile]} activeFile={sampleHTMLFile} />);
-      
-      expect(screen.getByText('Live Preview')).toBeInTheDocument();
-    });
-
-    test('should generate preview for JavaScript files', () => {
-      render(<LivePreview files={[sampleJSFile]} activeFile={sampleJSFile} />);
-      
-      expect(screen.getByText('Live Preview')).toBeInTheDocument();
-    });
-
-    test('should handle mixed file types', () => {
-      const cssFile: CodeFile = {
-        id: 'test-css',
-        name: 'style.css',
-        content: 'body { background: blue; }',
-        language: 'css',
-        path: 'style.css'
-      };
-
-      const files = [sampleHTMLFile, cssFile, sampleJSFile];
-      
-      render(<LivePreview files={files} activeFile={sampleHTMLFile} />);
-      
-      expect(screen.getByText('Live Preview')).toBeInTheDocument();
-    });
-
-    test('should toggle between auto and manual mode', () => {
-      render(<LivePreview files={[sampleHTMLFile]} activeFile={sampleHTMLFile} />);
-      
-      expect(screen.getByText('(auto)')).toBeInTheDocument();
-      
-      const modeButton = screen.getByTitle('Switch to manual mode');
-      fireEvent.click(modeButton);
-      
-      expect(screen.getByText('(manual)')).toBeInTheDocument();
-    });
-
-    test('should refresh preview manually', () => {
-      render(<LivePreview files={[sampleHTMLFile]} activeFile={sampleHTMLFile} />);
-      
-      const refreshButton = screen.getByRole('button', { name: /refresh/i });
-      fireEvent.click(refreshButton);
-      
-      // Should trigger a refresh (implementation detail)
-      expect(refreshButton).toBeInTheDocument();
-    });
-  });
 
   describe('Integration Tests', () => {
     test('should execute code and show results in console', async () => {

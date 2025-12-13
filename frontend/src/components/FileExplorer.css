@@ -1,89 +1,178 @@
+/* Minimalistic File Explorer */
 .file-explorer {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--bg-primary, #ffffff);
-    border-right: 1px solid var(--border-color, #e1e5e9);
-    min-width: 250px;
-    max-width: 400px;
+    background: transparent;
+    min-width: 240px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    color: #666666;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
+/* Remove all borders globally */
+.file-explorer *,
+.file-explorer *::before,
+.file-explorer *::after {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    background-color: transparent !important;
+}
+
+/* Override any inherited styles */
+.file-explorer .file-item,
+.file-explorer .file-node,
+.file-explorer .file-tree {
+    border: 0 !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    outline: 0 !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+/* Minimalistic Header */
 .file-explorer-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--bg-secondary, #f8f9fa);
-    border-bottom: 1px solid var(--border-color, #e1e5e9);
+    padding: 12px 16px 8px 16px;
+    background: transparent;
+    border-bottom: none;
+    min-height: 32px;
 }
 
 .file-explorer-header h3 {
     margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary, #2d3748);
+    font-size: 10px;
+    font-weight: 500;
+    color: #999999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1em;
 }
 
 .file-explorer-actions {
     display: flex;
-    gap: 4px;
+    gap: 2px;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.file-explorer-header:hover .file-explorer-actions {
+    opacity: 0.7;
 }
 
 .action-btn {
     background: none;
     border: none;
-    padding: 4px 6px;
-    border-radius: 4px;
+    padding: 2px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+    color: #aaaaaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 0;
+    transition: color 0.1s ease;
 }
 
 .action-btn:hover {
-    background: var(--bg-hover, #e2e8f0);
+    background: none;
+    color: #666666;
 }
 
+/* Minimalistic File Tree */
 .file-tree {
     flex: 1;
     overflow-y: auto;
-    padding: 8px 0;
+    padding: 0;
+    background: transparent;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .file-node {
     user-select: none;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: none !important;
+    margin: 0 !important;
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 8px;
+    gap: 6px;
+    padding: 1px 12px 1px 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: 4px;
-    margin: 0 4px;
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 13px;
+    line-height: 18px;
+    white-space: nowrap;
+    color: #777777;
+    transition: color 0.1s ease;
+    position: relative;
+    margin: 0 !important;
 }
 
 .file-item:hover {
-    background: var(--bg-hover, #e2e8f0);
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #333333;
 }
 
 .file-item.selected {
-    background: var(--primary-100, #e6f3ff);
-    color: var(--primary-700, #0052a3);
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #000000;
+    font-weight: 500;
 }
 
 .file-icon {
-    font-size: 14px;
-    width: 16px;
-    text-align: center;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #aaaaaa;
+    opacity: 0.7;
+}
+
+.file-item:hover .file-icon {
+    color: #666666;
+    opacity: 1;
+}
+
+.file-item.selected .file-icon {
+    color: #333333;
+    opacity: 1;
 }
 
 .file-name {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 400;
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -94,7 +183,7 @@
     margin-left: 0;
 }
 
-/* Context Menu */
+/* Minimalistic Context Menu */
 .context-menu-overlay {
     position: fixed;
     top: 0;
@@ -106,102 +195,315 @@
 
 .context-menu {
     position: fixed;
-    background: var(--bg-primary, #ffffff);
-    border: 1px solid var(--border-color, #e1e5e9);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    min-width: 150px;
-    padding: 4px 0;
+    min-width: 140px;
+    padding: 2px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .context-menu button {
     display: block;
     width: 100%;
-    padding: 8px 16px;
+    padding: 4px 12px;
     background: none;
     border: none;
     text-align: left;
     cursor: pointer;
-    font-size: 13px;
-    color: var(--text-primary, #2d3748);
-    transition: background-color 0.2s;
+    font-size: 12px;
+    color: #666666;
+    transition: color 0.1s ease;
 }
 
 .context-menu button:hover {
-    background: var(--bg-hover, #e2e8f0);
+    background: none;
+    color: #333333;
 }
 
 .context-menu button.danger {
-    color: var(--error-600, #dc2626);
+    color: #cc0000;
 }
 
 .context-menu button.danger:hover {
-    background: var(--error-50, #fef2f2);
+    background: none;
+    color: #990000;
 }
 
 .context-menu hr {
-    margin: 4px 0;
+    margin: 2px 0;
     border: none;
-    border-top: 1px solid var(--border-color, #e1e5e9);
+    border-top: 1px solid #f0f0f0;
 }
 
-/* Dark theme support */
+/* Minimalistic Dark Theme */
 [data-theme="dark"] .file-explorer {
-    background: var(--bg-primary-dark, #1a202c);
-    border-right-color: var(--border-color-dark, #2d3748);
+    background: transparent;
+    color: #aaaaaa;
+}
+
+[data-theme="dark"] .file-tree {
+    background: transparent;
 }
 
 [data-theme="dark"] .file-explorer-header {
-    background: var(--bg-secondary-dark, #2d3748);
-    border-bottom-color: var(--border-color-dark, #4a5568);
+    background: transparent;
 }
 
 [data-theme="dark"] .file-explorer-header h3 {
-    color: var(--text-primary-dark, #f7fafc);
+    color: #666666;
+}
+
+[data-theme="dark"] .action-btn {
+    color: #666666;
 }
 
 [data-theme="dark"] .action-btn:hover {
-    background: var(--bg-hover-dark, #4a5568);
+    background: none;
+    color: #aaaaaa;
+}
+
+[data-theme="dark"] .file-item {
+    color: #aaaaaa;
 }
 
 [data-theme="dark"] .file-item:hover {
-    background: var(--bg-hover-dark, #4a5568);
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #dddddd;
 }
 
 [data-theme="dark"] .file-item.selected {
-    background: var(--primary-800, #1a365d);
-    color: var(--primary-200, #90cdf4);
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .file-icon {
+    color: #777777;
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .file-item:hover .file-icon {
+    color: #aaaaaa;
+    opacity: 1;
+}
+
+[data-theme="dark"] .file-item.selected .file-icon {
+    color: #cccccc;
+    opacity: 1;
 }
 
 [data-theme="dark"] .context-menu {
-    background: var(--bg-primary-dark, #1a202c);
-    border-color: var(--border-color-dark, #2d3748);
+    background: #2a2a2a;
+    border-color: #444444;
 }
 
 [data-theme="dark"] .context-menu button {
-    color: var(--text-primary-dark, #f7fafc);
+    color: #aaaaaa;
 }
 
 [data-theme="dark"] .context-menu button:hover {
-    background: var(--bg-hover-dark, #4a5568);
+    background: none;
+    color: #dddddd;
 }
 
-/* Responsive design */
+[data-theme="dark"] .context-menu button.danger {
+    color: #ff6666;
+}
+
+[data-theme="dark"] .context-menu button.danger:hover {
+    background: none;
+    color: #ff4444;
+}
+
+[data-theme="dark"] .context-menu hr {
+    border-top-color: #444444;
+}
+
+/* Minimalistic Scrollbar */
+.file-tree::-webkit-scrollbar {
+    width: 4px;
+}
+
+.file-tree::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.file-tree::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+}
+
+.file-tree::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .file-tree::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .file-tree::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Minimalistic Responsive */
 @media (max-width: 768px) {
     .file-explorer {
-        min-width: 200px;
+        min-width: 180px;
+        font-size: 12px;
     }
 
     .file-explorer-header {
-        padding: 8px 12px;
+        padding: 8px 12px 6px 12px;
+        min-height: 28px;
     }
 
     .file-explorer-header h3 {
-        font-size: 13px;
+        font-size: 9px;
     }
 
-    .file-name {
+    .file-item {
+        padding: 1px 12px 1px 12px;
         font-size: 12px;
+        line-height: 18px;
+        gap: 6px;
     }
+
+    .file-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .action-btn {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Minimalistic Focus States */
+.file-item:focus {
+    outline: none;
+}
+
+[data-theme="dark"] .file-item:focus {
+    outline: none;
+}
+
+/* Minimalistic Typography */
+.file-explorer * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Clean Focus */
+.file-explorer button:focus {
+    outline: none;
+}
+
+.file-explorer button:active {
+    outline: none;
+}
+
+/* Minimalistic Spacing */
+.file-tree {
+    padding: 0;
+}
+
+/* Clean Layout */
+.file-item {
+    position: relative;
+}
+
+/* Minimalistic File Type Colors - Subtle */
+.file-item[data-extension="js"] .file-icon,
+.file-item[data-extension="jsx"] .file-icon {
+    color: #d4af37;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="ts"] .file-icon,
+.file-item[data-extension="tsx"] .file-icon {
+    color: #4a90e2;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="py"] .file-icon {
+    color: #5aa3d0;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="html"] .file-icon {
+    color: #e67e22;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="css"] .file-icon,
+.file-item[data-extension="scss"] .file-icon {
+    color: #9b59b6;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="json"] .file-icon {
+    color: #888888;
+    opacity: 0.8;
+}
+
+.file-item[data-extension="md"] .file-icon {
+    color: #3498db;
+    opacity: 0.8;
+}
+
+/* Minimalistic Folder Icons */
+.file-item[data-type="folder"] .file-icon {
+    color: #f39c12;
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .file-item[data-type="folder"] .file-icon {
+    color: #f39c12;
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .file-item[data-extension="json"] .file-icon {
+    color: #aaaaaa;
+    opacity: 0.8;
+}
+
+/* Ultra-aggressive border removal */
+.file-explorer {
+    isolation: isolate;
+}
+
+.file-explorer div,
+.file-explorer span,
+.file-explorer button {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: none !important;
+}
+
+/* Ensure no inherited borders */
+.file-item * {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove any potential list styling */
+.file-tree,
+.file-node,
+.file-item {
+    list-style: none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
+    list-style-position: outside !important;
 }

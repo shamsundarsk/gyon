@@ -260,7 +260,7 @@ router.get('/status', async (_req: Request, res: Response): Promise<void> => {
       data: {
         available: isAvailable,
         service: 'ollama',
-        model: process.env.OLLAMA_MODEL || 'llama3',
+        model: process.env.OLLAMA_MODEL || 'codellama',
         url: process.env.OLLAMA_URL || 'http://localhost:11434',
         timestamp: new Date().toISOString(),
       },

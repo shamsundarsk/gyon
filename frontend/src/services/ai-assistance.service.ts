@@ -66,7 +66,7 @@ class AIAssistanceService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002/api';
   }
 
   /**
@@ -74,7 +74,7 @@ class AIAssistanceService {
    */
   async getCodeCompletions(context: CodeContext): Promise<CodeCompletion[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/completions`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ class AIAssistanceService {
    */
   async explainCode(code: string, language: string): Promise<CodeExplanation> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/explain`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/explain`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ class AIAssistanceService {
    */
   async generateCode(description: string, language: string, context?: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/generate`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ class AIAssistanceService {
    */
   async getRefactoringSuggestions(code: string, language: string): Promise<RefactoringSuggestion[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/refactor`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/refactor`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ class AIAssistanceService {
    */
   async generateCodeFromComments(comments: string, language: string, context?: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/generate-from-comments`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/generate-from-comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,7 +224,7 @@ class AIAssistanceService {
    */
   async suggestErrorFixes(errorMessage: string, code: string, language: string): Promise<ErrorFix[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/fix-error`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/fix-error`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -254,7 +254,7 @@ class AIAssistanceService {
    */
   async generateDocumentation(code: string, language: string): Promise<DocumentationSuggestion> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/generate-docs`, {
+      const response = await fetch(`${this.baseUrl}/ai-assistance/generate-docs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -284,7 +284,7 @@ class AIAssistanceService {
    */
   async getStatus(): Promise<AIAssistanceStatus> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/ai-assistance/status`);
+      const response = await fetch(`${this.baseUrl}/ai-assistance/status`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

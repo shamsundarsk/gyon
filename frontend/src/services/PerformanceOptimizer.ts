@@ -76,8 +76,8 @@ class PerformanceOptimizer {
   private monitorNavigationTiming(): void {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     if (navigation) {
-      this.metrics.loadTime = navigation.loadEventEnd - navigation.navigationStart;
-      this.metrics.renderTime = navigation.domContentLoadedEventEnd - navigation.navigationStart;
+      this.metrics.loadTime = navigation.loadEventEnd - (navigation as any).navigationStart;
+      this.metrics.renderTime = navigation.domContentLoadedEventEnd - (navigation as any).navigationStart;
     }
   }
 
@@ -296,7 +296,9 @@ class PerformanceOptimizer {
       set: (key: string, value: any) => {
         if (cache.size >= maxCacheSize) {
           const firstKey = cache.keys().next().value;
-          cache.delete(firstKey);
+          if (firstKey !== undefined) {
+            cache.delete(firstKey);
+          }
         }
         cache.set(key, value);
       },
@@ -456,7 +458,7 @@ class PerformanceOptimizer {
     func: T,
     delay: number
   ): (...args: Parameters<T>) => void {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: number;
     return (...args: Parameters<T>) => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => func(...args), delay);

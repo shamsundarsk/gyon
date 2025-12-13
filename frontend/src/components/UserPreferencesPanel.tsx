@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { userPreferencesService, UserPreferences, DEFAULT_PREFERENCES } from '../services/UserPreferencesService';
+import { userPreferencesService, UserPreferences } from '../services/UserPreferencesService';
 import { ThemeToggle } from './ThemeToggle';
 import './UserPreferencesPanel.css';
 

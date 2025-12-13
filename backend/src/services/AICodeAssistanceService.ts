@@ -71,7 +71,7 @@ export class AICodeAssistanceService {
 
       const prompt = this.buildCompletionPrompt(context);
       const response = await ollamaClient.generate(prompt, {
-        model: process.env.OLLAMA_MODEL || 'llama3',
+        model: process.env.OLLAMA_MODEL || 'codellama',
         temperature: 0.3, // Lower temperature for more consistent code
         max_tokens: 500,
       });
@@ -100,7 +100,7 @@ export class AICodeAssistanceService {
 
       const prompt = this.buildExplanationPrompt(code, language);
       const response = await ollamaClient.generate(prompt, {
-        model: process.env.OLLAMA_MODEL || 'llama3',
+        model: process.env.OLLAMA_MODEL || 'codellama',
         temperature: 0.5,
         max_tokens: 800,
       });
@@ -126,7 +126,7 @@ export class AICodeAssistanceService {
 
       const prompt = this.buildCodeGenerationPrompt(description, language, context);
       const response = await ollamaClient.generate(prompt, {
-        model: process.env.OLLAMA_MODEL || 'llama3',
+        model: process.env.OLLAMA_MODEL || 'codellama',
         temperature: 0.4,
         max_tokens: 1000,
       });
@@ -142,7 +142,7 @@ export class AICodeAssistanceService {
   }
 
   /**
-   * Build prompt for code completion
+   * Build prompt for code completion - Enhanced Cursor/Copilot style
    */
   private buildCompletionPrompt(context: CodeContext): string {
     const { content, language, position } = context;
@@ -151,14 +151,34 @@ export class AICodeAssistanceService {
     const beforeCursor = currentLine.substring(0, position.column);
     const afterCursor = currentLine.substring(position.column);
 
-    // Get surrounding context (5 lines before and after)
-    const startLine = Math.max(0, position.line - 5);
-    const endLine = Math.min(lines.length - 1, position.line + 5);
+    // Get more context for better suggestions (15 lines before and after)
+    const startLine = Math.max(0, position.line - 15);
+    const endLine = Math.min(lines.length - 1, position.line + 15);
     const contextLines = lines.slice(startLine, endLine + 1);
 
-    return `You are a code completion assistant. Given the following ${language} code context, suggest appropriate completions for the cursor position.
+    // Detect patterns for smarter completions
+    const isInFunction = content.includes('function') || content.includes('=>');
+    const isInClass = content.includes('class ');
+    const isInComment = beforeCursor.includes('//') || beforeCursor.includes('/*');
+    const isAfterDot = beforeCursor.endsWith('.');
+    const isAfterOpenParen = beforeCursor.endsWith('(');
 
-Context:
+    let contextHint = '';
+    if (isInComment) {
+      contextHint = 'The user is writing a comment. Suggest meaningful comment completions or code based on the comment.';
+    } else if (isAfterDot) {
+      contextHint = 'The user just typed a dot. Suggest relevant methods, properties, or chained operations.';
+    } else if (isAfterOpenParen) {
+      contextHint = 'The user just opened parentheses. Suggest function parameters or arguments.';
+    } else if (isInFunction) {
+      contextHint = 'The user is inside a function. Suggest relevant function body code, variables, or logic.';
+    } else if (isInClass) {
+      contextHint = 'The user is inside a class. Suggest methods, properties, or class-related code.';
+    }
+
+    return `You are an advanced AI code completion assistant like GitHub Copilot. Analyze the ${language} code and provide intelligent, contextually relevant completions.
+
+Code Context:
 \`\`\`${language}
 ${contextLines.join('\n')}
 \`\`\`
@@ -166,26 +186,30 @@ ${contextLines.join('\n')}
 Current line: "${currentLine}"
 Before cursor: "${beforeCursor}"
 After cursor: "${afterCursor}"
-Cursor position: line ${position.line + 1}, column ${position.column + 1}
+Position: line ${position.line + 1}, column ${position.column + 1}
 
-Provide 1-3 relevant code completions. For each completion, specify:
-1. The completion text
-2. The type (function, variable, class, method, property, keyword, snippet)
-3. A brief description
+${contextHint}
 
-Format your response as JSON:
+Provide 2-4 highly relevant completions that a professional developer would find useful. Focus on:
+1. Completing the current statement intelligently
+2. Suggesting common patterns for the current context
+3. Providing helpful code snippets
+4. Following ${language} best practices
+
+Response format (JSON):
 {
   "completions": [
     {
-      "text": "completion text",
+      "text": "what the user would see",
       "kind": "function|variable|class|method|property|keyword|snippet",
-      "detail": "brief description",
-      "insertText": "text to insert"
+      "detail": "helpful description",
+      "insertText": "actual code to insert",
+      "documentation": "optional longer explanation"
     }
   ]
 }
 
-Focus on contextually relevant suggestions based on the surrounding code.`;
+Make suggestions that feel natural and save the developer time.`;
   }
 
   /**
@@ -528,7 +552,7 @@ Use the appropriate documentation format for the ${language} language.`;
 
       const prompt = this.buildRefactoringPrompt(code, language);
       const response = await ollamaClient.generate(prompt, {
-        model: process.env.OLLAMA_MODEL || 'llama3',
+        model: process.env.OLLAMA_MODEL || 'codellama',
         temperature: 0.4,
         max_tokens: 1200,
       });

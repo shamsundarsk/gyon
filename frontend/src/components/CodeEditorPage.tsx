@@ -6,7 +6,9 @@ import ProjectSwitcher from './ProjectSwitcher';
 import ProjectTemplateSelector from './ProjectTemplateSelector';
 import Console from './Console';
 import CodeRunner from './CodeRunner';
-import LivePreview from './LivePreview';
+
+import Terminal from './Terminal';
+import SmartAIAssistant from './SmartAIAssistant';
 import { useFileManager } from '../hooks/useFileManager';
 import { projectImportService } from '../services/ProjectImportService';
 import { ProjectTemplate } from '../services/ProjectTemplates';
@@ -44,7 +46,7 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [bottomPanelHeight, setBottomPanelHeight] = useState(300);
   const [isBottomPanelVisible, setIsBottomPanelVisible] = useState(true);
-  const [activeBottomTab, setActiveBottomTab] = useState<'console' | 'runner' | 'preview'>('console');
+  const [activeBottomTab, setActiveBottomTab] = useState<'console' | 'runner' | 'terminal'>('console');
   const [isResizingBottom, setIsResizingBottom] = useState(false);
   const [showProjectGallery, setShowProjectGallery] = useState(false);
   const [showSharingDialog, setShowSharingDialog] = useState(false);
@@ -398,39 +400,7 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
     setIsBottomPanelVisible(!isBottomPanelVisible);
   };
 
-  const getAllProjectFiles = (): CodeFile[] => {
-    if (importedProject) {
-      return importedProject.files;
-    }
-    
-    if (activeProject) {
-      // Convert FileNodes to CodeFiles
-      const convertFileNodes = (nodes: FileNode[]): CodeFile[] => {
-        const files: CodeFile[] = [];
-        
-        const traverse = (node: FileNode) => {
-          if (node.type === 'file') {
-            files.push({
-              id: node.id,
-              name: node.name,
-              content: node.content || '',
-              language: getLanguageFromPath(node.path),
-              path: node.path
-            });
-          } else if (node.children) {
-            node.children.forEach(traverse);
-          }
-        };
-        
-        nodes.forEach(traverse);
-        return files;
-      };
-      
-      return convertFileNodes(activeProject.files);
-    }
-    
-    return [];
-  };
+
 
   // Helper function to find the first file in a file tree
   const findFirstFile = (files: FileNode[]): FileNode | null => {
@@ -542,7 +512,11 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
             title="Browse Project Gallery"
             onClick={() => setShowProjectGallery(true)}
           >
-            📚 Gallery
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Gallery
           </button>
           <button 
             className="share-button" 
@@ -550,14 +524,37 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
             onClick={() => setShowSharingDialog(true)}
             disabled={!activeProject || openFiles.length === 0}
           >
-            🔗 Share
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share
           </button>
           <button 
             className="theme-toggle" 
             title="Toggle theme"
             onClick={handleThemeToggle}
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === 'light' ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+            )}
           </button>
         </div>
       </div>
@@ -591,18 +588,52 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
               onFileCloseAll={handleFileCloseAll}
             />
             
-            <div className="editor-area">
-              <CodeEditor
-                file={activeFile}
-                onFileChange={handleFileChange}
-                onRunCode={(_file) => {
-                  setActiveBottomTab('runner');
-                  setIsBottomPanelVisible(true);
-                  // The CodeRunner will handle the actual execution
-                }}
-                height="100%"
-                theme={theme}
-              />
+            <div className="editor-with-ai">
+              <div className="monaco-editor-container">
+                <CodeEditor
+                  file={activeFile}
+                  onFileChange={handleFileChange}
+                  onRunCode={(_file) => {
+                    setActiveBottomTab('runner');
+                    setIsBottomPanelVisible(true);
+                    // The CodeRunner will handle the actual execution
+                  }}
+                  height="100%"
+                  theme={theme}
+                />
+              </div>
+              
+              <div className="ai-assistant-container">
+                <SmartAIAssistant
+                  isOpen={true}
+                  onClose={() => {}}
+                  currentFile={activeFile ? {
+                    name: activeFile.name,
+                    content: activeFile.content,
+                    language: activeFile.language,
+                  } : undefined}
+                  onCodeInsert={(code) => {
+                    if (activeFile) {
+                      const updatedFile = {
+                        ...activeFile,
+                        content: activeFile.content + '\n' + code
+                      };
+                      handleFileChange(updatedFile);
+                    }
+                  }}
+                  onCodeReplace={(oldCode, newCode) => {
+                    if (activeFile) {
+                      const updatedFile = {
+                        ...activeFile,
+                        content: activeFile.content.replace(oldCode, newCode)
+                      };
+                      handleFileChange(updatedFile);
+                    }
+                  }}
+                  selectedText=""
+                  cursorPosition={{ line: 0, column: 0 }}
+                />
+              </div>
             </div>
           </div>
           
@@ -623,19 +654,32 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
                       className={`bottom-tab ${activeBottomTab === 'console' ? 'active' : ''}`}
                       onClick={() => setActiveBottomTab('console')}
                     >
-                      🖥️ Console
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                      </svg>
+                      Console
                     </button>
                     <button
                       className={`bottom-tab ${activeBottomTab === 'runner' ? 'active' : ''}`}
                       onClick={() => setActiveBottomTab('runner')}
                     >
-                      ▶️ Runner
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polygon points="5,3 19,12 5,21"/>
+                      </svg>
+                      Runner
                     </button>
+
                     <button
-                      className={`bottom-tab ${activeBottomTab === 'preview' ? 'active' : ''}`}
-                      onClick={() => setActiveBottomTab('preview')}
+                      className={`bottom-tab ${activeBottomTab === 'terminal' ? 'active' : ''}`}
+                      onClick={() => setActiveBottomTab('terminal')}
                     >
-                      👁️ Preview
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="4,17 10,11 4,5"/>
+                        <line x1="12" y1="19" x2="20" y2="19"/>
+                      </svg>
+                      Terminal
                     </button>
                   </div>
                   
@@ -658,11 +702,9 @@ export const CodeEditorPage: React.FC<CodeEditorPageProps> = ({
                       onExecutionComplete={handleExecutionComplete}
                     />
                   )}
-                  {activeBottomTab === 'preview' && (
-                    <LivePreview
-                      files={getAllProjectFiles()}
-                      activeFile={activeFile}
-                    />
+
+                  {activeBottomTab === 'terminal' && (
+                    <Terminal />
                   )}
                 </div>
               </div>

@@ -126,9 +126,7 @@ vi.mock('../CodeRunner', () => ({
   default: () => <div data-testid="code-runner">Code Runner</div>
 }));
 
-vi.mock('../LivePreview', () => ({
-  default: () => <div data-testid="live-preview">Live Preview</div>
-}));
+
 
 vi.mock('../ProjectGallery', () => ({
   default: () => <div data-testid="project-gallery">Project Gallery</div>

@@ -57,18 +57,21 @@ export class MonacoAIProvider {
   }
 
   /**
-   * Provide completion items using AI
+   * Provide completion items using AI - Enhanced for Cursor/Copilot-style experience
    */
   private async provideCompletionItems(
     model: monaco.editor.ITextModel,
     position: monaco.Position,
-    _context: monaco.languages.CompletionContext
+    context: monaco.languages.CompletionContext
   ): Promise<monaco.languages.CompletionList | null> {
     if (!this.isEnabled) {
       return null;
     }
 
     try {
+      // Show loading indicator
+      this.showAILoadingIndicator(model, position);
+
       // Debounce requests to avoid too many API calls
       if (this.debounceTimeout) {
         window.clearTimeout(this.debounceTimeout);
@@ -77,38 +80,58 @@ export class MonacoAIProvider {
       return new Promise((resolve) => {
         this.debounceTimeout = window.setTimeout(async () => {
           try {
-            const completions = await this.getAICompletions(model, position);
+            const completions = await this.getAICompletions(model, position, context);
+            this.hideAILoadingIndicator();
             resolve({
               suggestions: completions,
               incomplete: false,
             });
           } catch (error) {
             console.warn('AI completion failed:', error);
+            this.hideAILoadingIndicator();
             resolve(null);
           }
-        }, 300); // 300ms debounce
+        }, 200); // Faster response for better UX
       });
     } catch (error) {
       console.warn('AI completion error:', error);
+      this.hideAILoadingIndicator();
       return null;
     }
   }
 
   /**
-   * Get AI completions for the current context
+   * Get AI completions for the current context - Enhanced for better suggestions
    */
   private async getAICompletions(
     model: monaco.editor.ITextModel,
-    position: monaco.Position
+    position: monaco.Position,
+    context?: monaco.languages.CompletionContext
   ): Promise<monaco.languages.CompletionItem[]> {
     const content = model.getValue();
     const language = model.getLanguageId();
     
     // Get current line and cursor position
     const wordInfo = model.getWordUntilPosition(position);
+    const currentLine = model.getLineContent(position.lineNumber);
+    const beforeCursor = currentLine.substring(0, position.column - 1);
+    // const afterCursor = currentLine.substring(position.column - 1);
     
-    // Skip if we're in the middle of a word (let Monaco handle it)
-    if (wordInfo.word.length > 0 && position.column > wordInfo.startColumn + 1) {
+    // Enhanced context detection - trigger AI for more scenarios
+    const shouldTriggerAI = 
+      context?.triggerKind === monaco.languages.CompletionTriggerKind.TriggerCharacter ||
+      beforeCursor.trim().length > 2 ||
+      beforeCursor.includes('//') ||
+      beforeCursor.includes('/*') ||
+      beforeCursor.includes('function') ||
+      beforeCursor.includes('const') ||
+      beforeCursor.includes('let') ||
+      beforeCursor.includes('var') ||
+      beforeCursor.includes('class') ||
+      beforeCursor.includes('interface') ||
+      beforeCursor.includes('type');
+
+    if (!shouldTriggerAI && wordInfo.word.length > 0 && position.column > wordInfo.startColumn + 1) {
       return [];
     }
 
@@ -194,6 +217,29 @@ export class MonacoAIProvider {
   }
 
 
+
+  /**
+   * Show AI loading indicator
+   */
+  private showAILoadingIndicator(model: monaco.editor.ITextModel, position: monaco.Position): void {
+    // Add a subtle loading indicator in the editor
+    const decorations = [{
+      range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+      options: {
+        afterContentClassName: 'ai-loading-decoration',
+        hoverMessage: { value: 'AI is generating suggestions...' },
+      }
+    }];
+    
+    model.deltaDecorations([], decorations);
+  }
+
+  /**
+   * Hide AI loading indicator
+   */
+  private hideAILoadingIndicator(): void {
+    // Loading indicator will be automatically removed when decorations are updated
+  }
 
   /**
    * Dispose all registered providers

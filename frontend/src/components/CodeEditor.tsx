@@ -5,7 +5,10 @@ import { monacoAIProvider } from '../services/MonacoAIProvider';
 import { aiAssistanceService } from '../services/ai-assistance.service';
 import { performanceOptimizer } from '../services/PerformanceOptimizer';
 import { accessibilityService } from '../services/AccessibilityService';
+import { inlineAIProvider } from '../services/InlineAIProvider';
+import { proactiveAIAnalyzer, CodeIssue, SmartSuggestion } from '../services/ProactiveAIAnalyzer';
 import ProgressIndicator, { useProgress } from './ProgressIndicator';
+import SmartAIAssistant from './SmartAIAssistant';
 import './CodeEditor.css';
 
 export interface CodeFile {
@@ -47,6 +50,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const [syntaxErrors, setSyntaxErrors] = useState<monaco.editor.IMarkerData[]>([]);
   const [isLazyLoaded, setIsLazyLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [selectedText, setSelectedText] = useState<string>('');
+  const [cursorPosition, setCursorPosition] = useState<{ line: number; column: number }>({ line: 0, column: 0 });
+  const [codeIssues, setCodeIssues] = useState<CodeIssue[]>([]);
+  const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestion[]>([]);
   const aiProgress = useProgress();
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
@@ -227,8 +235,31 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
     // Register AI completion provider
     if (aiEnabled && aiStatus.available) {
+      console.log('Registering AI completion provider...');
       monacoAIProvider.registerCompletionProvider();
       monacoAIProvider.setEnabled(true);
+      
+      // Initialize inline AI provider
+      inlineAIProvider.initialize(editor);
+      inlineAIProvider.setEnabled(true);
+      
+      // Add AI completion indicator
+      const aiIndicator = document.createElement('div');
+      aiIndicator.className = 'ai-completion-indicator';
+      aiIndicator.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+          <circle cx="12" cy="5" r="2"/>
+          <path d="M12 7v4"/>
+        </svg>
+        <span>AI</span>
+      `;
+      aiIndicator.title = 'AI assistance is active - Press Ctrl+Space for suggestions';
+      
+      const editorElement = editor.getDomNode();
+      if (editorElement) {
+        editorElement.appendChild(aiIndicator);
+      }
     }
 
     // Setup syntax validation
@@ -246,6 +277,34 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }, 300);
     
     editor.onDidChangeModelContent(debouncedValidation);
+
+    // Track selection changes for AI assistance (with error handling for tests)
+    try {
+      if (editor.onDidChangeCursorSelection) {
+        editor.onDidChangeCursorSelection((e) => {
+          const selection = e.selection;
+          const model = editor.getModel();
+          if (model && !selection.isEmpty()) {
+            const selectedText = model.getValueInRange(selection);
+            setSelectedText(selectedText);
+          } else {
+            setSelectedText('');
+          }
+        });
+      }
+
+      // Track cursor position
+      if (editor.onDidChangeCursorPosition) {
+        editor.onDidChangeCursorPosition((e) => {
+          setCursorPosition({
+            line: e.position.lineNumber,
+            column: e.position.column
+          });
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to setup cursor tracking:', error);
+    }
     
     // Record editor initialization time
     const initTime = performance.now();
@@ -481,6 +540,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       await explainSelectedCode(editor);
     });
 
+    // Open AI Assistant
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyA, () => {
+      setShowAIAssistant(true);
+    });
+
     // Toggle comment
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, () => {
       editor.trigger('comment', 'editor.action.commentLine', {});
@@ -675,7 +739,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           await new Promise(resolve => setTimeout(resolve, 50));
         }
         
-        const completeContent = await performanceOptimizer.loadCompleteFile(file.id);
+        const completeContent = file.content; // Fallback for now
         const editor = editorRef.current;
         if (editor) {
           editor.setValue(completeContent);
@@ -701,13 +765,22 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
-  // Check AI status on mount
+  // Check AI status on mount and periodically
   useEffect(() => {
     const checkAIStatus = async () => {
       try {
+        console.log('Checking AI status...');
         const status = await aiAssistanceService.getStatus();
+        console.log('AI status response:', status);
         setAiStatus({ available: status.available, loading: false });
-        monacoAIProvider.setEnabled(status.available && aiEnabled);
+        
+        if (status.available && aiEnabled) {
+          console.log('Enabling AI provider...');
+          monacoAIProvider.setEnabled(true);
+        } else {
+          console.log('Disabling AI provider...');
+          monacoAIProvider.setEnabled(false);
+        }
       } catch (error) {
         console.warn('Failed to check AI status:', error);
         setAiStatus({ available: false, loading: false });
@@ -715,13 +788,86 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       }
     };
 
+    // Initial check
     checkAIStatus();
+    
+    // Periodic check every 30 seconds
+    const interval = setInterval(checkAIStatus, 30000);
+    
+    return () => clearInterval(interval);
   }, [aiEnabled]);
 
   // Update AI provider when AI enabled state changes
   useEffect(() => {
-    monacoAIProvider.setEnabled(aiEnabled && aiStatus.available);
+    const isAIActive = aiEnabled && aiStatus.available;
+    monacoAIProvider.setEnabled(isAIActive);
+    inlineAIProvider.setEnabled(isAIActive);
   }, [aiEnabled, aiStatus.available]);
+
+  // Setup proactive AI analysis
+  useEffect(() => {
+    const handleAnalysisResults = (issues: CodeIssue[], suggestions: SmartSuggestion[]) => {
+      setCodeIssues(issues);
+      setSmartSuggestions(suggestions);
+    };
+
+    proactiveAIAnalyzer.addListener(handleAnalysisResults);
+
+    return () => {
+      proactiveAIAnalyzer.removeListener(handleAnalysisResults);
+    };
+  }, []);
+
+  // Trigger proactive analysis when file content changes
+  useEffect(() => {
+    if (file && aiEnabled && aiStatus.available) {
+      proactiveAIAnalyzer.analyzeCode(file.content, currentLanguage, file.name);
+    }
+  }, [file?.content, currentLanguage, aiEnabled, aiStatus.available]);
+
+  // Handle code insertion from AI Assistant
+  const handleCodeInsert = useCallback((code: string) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const position = editor.getPosition();
+    if (!position) return;
+
+    editor.executeEdits('ai-assistant', [{
+      range: {
+        startLineNumber: position.lineNumber,
+        startColumn: position.column,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      },
+      text: code,
+    }]);
+
+    // Focus back to editor
+    editor.focus();
+  }, []);
+
+  // Handle code replacement from AI Assistant
+  const handleCodeReplace = useCallback((oldCode: string, newCode: string) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const model = editor.getModel();
+    if (!model) return;
+
+    // Find the old code in the editor
+    const matches = model.findMatches(oldCode, false, false, false, null, false);
+    if (matches.length > 0) {
+      const match = matches[0];
+      editor.executeEdits('ai-assistant-replace', [{
+        range: match.range,
+        text: newCode,
+      }]);
+    }
+
+    // Focus back to editor
+    editor.focus();
+  }, []);
 
   if (!file) {
     return (
@@ -759,6 +905,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               ⚠️ {syntaxErrors.length}
             </span>
           )}
+          {codeIssues.length > 0 && (
+            <span className="ai-issues" title={`${codeIssues.length} AI suggestion(s)`}>
+              🤖 {codeIssues.length}
+            </span>
+          )}
+          {smartSuggestions.length > 0 && (
+            <span className="smart-suggestions-indicator" title={`${smartSuggestions.length} improvement(s) available`}>
+              ✨ {smartSuggestions.length}
+            </span>
+          )}
         </div>
         <div className="editor-toolbar">
           {isLazyLoaded && (
@@ -777,7 +933,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             title="Format Document (Ctrl+Shift+F)"
             aria-label="Format document"
           >
-            🎨
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="16,3 21,3 21,8"/>
+              <line x1="4" y1="7" x2="4" y2="20"/>
+              <line x1="9" y1="9" x2="20" y2="9"/>
+              <line x1="9" y1="15" x2="20" y2="15"/>
+            </svg>
           </button>
           <button
             className="toolbar-btn"
@@ -790,7 +951,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             title="Find (Ctrl+F)"
             aria-label="Find in document"
           >
-            🔍
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
           </button>
           <button
             className="toolbar-btn"
@@ -803,11 +967,35 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             title="Find & Replace (Ctrl+H)"
             aria-label="Find and replace"
           >
-            🔄
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
           </button>
+          {aiStatus.available && (
+            <button
+              className="toolbar-btn ai-assistant-btn"
+              onClick={() => setShowAIAssistant(true)}
+              title="Open AI Assistant (Ctrl+Shift+A)"
+              aria-label="Open AI Assistant"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M8 9h8M8 13h6"/>
+              </svg>
+            </button>
+          )}
           <div className="ai-status">
             {aiStatus.loading ? (
-              <span className="ai-status-loading" aria-live="polite">Checking AI...</span>
+              <span className="ai-status-loading" aria-live="polite">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                </svg>
+                Checking AI...
+              </span>
             ) : aiStatus.available ? (
               <button
                 className={`ai-toggle ${aiEnabled ? 'enabled' : 'disabled'}`}
@@ -816,7 +1004,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                 aria-label={`AI assistance is ${aiEnabled ? 'enabled' : 'disabled'}. Click to ${aiEnabled ? 'disable' : 'enable'}.`}
                 aria-pressed={aiEnabled}
               >
-                🤖 AI {aiEnabled ? 'ON' : 'OFF'}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                  <circle cx="12" cy="5" r="2"/>
+                  <path d="M12 7v4"/>
+                  <line x1="8" y1="16" x2="8" y2="16"/>
+                  <line x1="16" y1="16" x2="16" y2="16"/>
+                </svg>
+                AI {aiEnabled ? 'ON' : 'OFF'}
               </button>
             ) : (
               <span 
@@ -824,7 +1019,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                 title="AI assistance unavailable"
                 aria-label="AI assistance is currently unavailable"
               >
-                🤖 AI Unavailable
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                  <circle cx="12" cy="5" r="2"/>
+                  <path d="M12 7v4"/>
+                  <line x1="8" y1="16" x2="8" y2="16"/>
+                  <line x1="16" y1="16" x2="16" y2="16"/>
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                </svg>
+                AI Unavailable
               </span>
             )}
           </div>
@@ -837,30 +1040,277 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           width={width}
           language={currentLanguage}
           value={file.content}
-          theme={theme === 'dark' ? 'vs-dark' : 'vs'}
+          theme={theme === 'dark' ? 'minimal-dark' : 'minimal-light'}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
+          beforeMount={(monaco) => {
+            // Define custom themes
+            monaco.editor.defineTheme('minimal-light', {
+              base: 'vs',
+              inherit: true,
+              rules: [
+                { token: 'comment', foreground: '999999', fontStyle: 'italic' },
+                { token: 'keyword', foreground: '333333', fontStyle: 'bold' },
+                { token: 'string', foreground: '666666' },
+                { token: 'number', foreground: '666666' },
+                { token: 'regexp', foreground: '666666' },
+                { token: 'type', foreground: '333333' },
+                { token: 'class', foreground: '333333' },
+                { token: 'function', foreground: '333333' },
+                { token: 'variable', foreground: '333333' },
+                { token: 'constant', foreground: '666666' },
+                { token: 'operator', foreground: '333333' },
+                { token: 'delimiter', foreground: '333333' },
+              ],
+              colors: {
+                'editor.background': '#ffffff',
+                'editor.foreground': '#333333',
+                'editor.lineHighlightBackground': '#fafafa',
+                'editor.selectionBackground': '#e0e0e0',
+                'editor.inactiveSelectionBackground': '#f0f0f0',
+                'editorCursor.foreground': '#333333',
+                'editorLineNumber.foreground': '#cccccc',
+                'editorLineNumber.activeForeground': '#999999',
+                'editorIndentGuide.background': '#f0f0f0',
+                'editorIndentGuide.activeBackground': '#e0e0e0',
+                'editorWhitespace.foreground': '#f0f0f0',
+                'editorRuler.foreground': '#f0f0f0',
+                'scrollbarSlider.background': '#e0e0e0',
+                'scrollbarSlider.hoverBackground': '#cccccc',
+                'scrollbarSlider.activeBackground': '#999999',
+              }
+            });
+
+            monaco.editor.defineTheme('minimal-dark', {
+              base: 'vs-dark',
+              inherit: true,
+              rules: [
+                { token: 'comment', foreground: '888888', fontStyle: 'italic' },
+                { token: 'keyword', foreground: 'cccccc', fontStyle: 'bold' },
+                { token: 'string', foreground: 'aaaaaa' },
+                { token: 'number', foreground: 'aaaaaa' },
+                { token: 'regexp', foreground: 'aaaaaa' },
+                { token: 'type', foreground: 'cccccc' },
+                { token: 'class', foreground: 'cccccc' },
+                { token: 'function', foreground: 'cccccc' },
+                { token: 'variable', foreground: 'cccccc' },
+                { token: 'constant', foreground: 'aaaaaa' },
+                { token: 'operator', foreground: 'cccccc' },
+                { token: 'delimiter', foreground: 'cccccc' },
+              ],
+              colors: {
+                'editor.background': '#1a1a1a',
+                'editor.foreground': '#cccccc',
+                'editor.lineHighlightBackground': '#1e1e1e',
+                'editor.selectionBackground': '#444444',
+                'editor.inactiveSelectionBackground': '#333333',
+                'editorCursor.foreground': '#cccccc',
+                'editorLineNumber.foreground': '#666666',
+                'editorLineNumber.activeForeground': '#888888',
+                'editorIndentGuide.background': '#333333',
+                'editorIndentGuide.activeBackground': '#444444',
+                'editorWhitespace.foreground': '#333333',
+                'editorRuler.foreground': '#333333',
+                'scrollbarSlider.background': '#444444',
+                'scrollbarSlider.hoverBackground': '#555555',
+                'scrollbarSlider.activeBackground': '#666666',
+              }
+            });
+          }}
           options={{
+            // Professional editor appearance
             selectOnLineNumbers: true,
-            roundedSelection: false,
+            roundedSelection: true,
             readOnly: readOnly,
             cursorStyle: 'line',
             automaticLayout: true,
             glyphMargin: true,
             folding: true,
-            lineDecorationsWidth: 10,
-            lineNumbersMinChars: 3,
+            lineDecorationsWidth: 15,
+            lineNumbersMinChars: 4,
             renderLineHighlight: 'all',
+            
+            // Minimal visual features
+            fontSize: 13,
+            fontFamily: "'SF Mono', 'Monaco', 'Consolas', monospace",
+            fontLigatures: false,
+            lineHeight: 18,
+            letterSpacing: 0,
+            
+            // Minimal scrollbars
             scrollbar: {
-              vertical: 'visible',
-              horizontal: 'visible',
+              vertical: 'auto',
+              horizontal: 'auto',
               useShadows: false,
               verticalHasArrows: false,
               horizontalHasArrows: false,
+              verticalScrollbarSize: 8,
+              horizontalScrollbarSize: 8,
             },
+            
+            // Minimal minimap
+            minimap: {
+              enabled: false,
+            },
+            
+            // Professional bracket matching
+            bracketPairColorization: { enabled: true },
+            guides: {
+              bracketPairs: true,
+              bracketPairsHorizontal: true,
+              highlightActiveBracketPair: true,
+              indentation: true,
+              highlightActiveIndentation: true,
+            },
+            
+            // Enhanced suggestions
+            suggest: {
+              showIcons: true,
+              showMethods: true,
+              showFunctions: true,
+              showConstructors: true,
+              showFields: true,
+              showVariables: true,
+              showClasses: true,
+              showStructs: true,
+              showInterfaces: true,
+              showModules: true,
+              showProperties: true,
+              showEvents: true,
+              showOperators: true,
+              showUnits: true,
+              showValues: true,
+              showConstants: true,
+              showEnums: true,
+              showEnumMembers: true,
+              showKeywords: true,
+              showWords: true,
+              showColors: true,
+              showFiles: true,
+              showReferences: true,
+              showFolders: true,
+              showTypeParameters: true,
+              showSnippets: true,
+              insertMode: 'insert',
+              filterGraceful: true,
+              snippetsPreventQuickSuggestions: false,
+            },
+            
+            // Professional hover and tooltips
+            hover: {
+              enabled: true,
+              delay: 300,
+              sticky: true,
+            },
+            
+            // Enhanced find widget
+            find: {
+              cursorMoveOnType: true,
+              seedSearchStringFromSelection: 'always',
+              autoFindInSelection: 'never',
+              addExtraSpaceOnTop: true,
+              loop: true,
+            },
+            
+            // Code lens and references
+            codeLens: true,
+            
+            // Professional formatting
+            formatOnPaste: true,
+            formatOnType: true,
+            autoIndent: 'full',
+            
+            // Enhanced selection and multi-cursor
+            multiCursorModifier: 'ctrlCmd',
+            selectionHighlight: true,
+            occurrencesHighlight: 'singleFile',
+            
+            // Professional whitespace and rulers
+            renderWhitespace: 'selection',
+            rulers: [80, 120],
+            
+            // Enhanced word wrapping
+            wordWrap: 'off',
+            wordWrapColumn: 120,
+            wrappingIndent: 'indent',
+            
+            // Professional padding and margins
+            padding: { top: 16, bottom: 16 },
+            
+            // Enhanced accessibility
+            accessibilitySupport: 'on',
+            
+            // Performance optimizations
+            smoothScrolling: true,
+            mouseWheelZoom: true,
+            fastScrollSensitivity: 5,
           }}
         />
       </div>
+      
+      {/* Professional Status Bar */}
+      <div className="code-editor-status-bar">
+        <div className="status-left">
+          <span className="status-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            {currentLanguage.toUpperCase()}
+          </span>
+          <span className="status-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+              <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+            </svg>
+            UTF-8
+          </span>
+          {syntaxErrors.length > 0 && (
+            <span className="status-item status-error">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              {syntaxErrors.length} error{syntaxErrors.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+        <div className="status-right">
+          {aiStatus.available && aiEnabled && (
+            <span className="status-item status-ai">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                <circle cx="12" cy="5" r="2"/>
+                <path d="M12 7v4"/>
+              </svg>
+              AI Active
+            </span>
+          )}
+          <span className="status-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+            </svg>
+            {file.content.split('\n').length} lines
+          </span>
+        </div>
+      </div>
+
+      {/* Smart AI Assistant */}
+      <SmartAIAssistant
+        isOpen={showAIAssistant}
+        onClose={() => setShowAIAssistant(false)}
+        currentFile={file ? {
+          name: file.name,
+          content: file.content,
+          language: currentLanguage,
+        } : undefined}
+        onCodeInsert={handleCodeInsert}
+        onCodeReplace={handleCodeReplace}
+        selectedText={selectedText}
+        cursorPosition={cursorPosition}
+      />
     </div>
   );
 };
