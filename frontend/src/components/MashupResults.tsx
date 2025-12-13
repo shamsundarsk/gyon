@@ -9,7 +9,7 @@ import OpenEditorButton from './OpenEditorButton';
 import RegenerateButton from './RegenerateButton';
 import { CustomGenerateButton } from './CustomGenerateButton';
 import { FAQ } from './FAQ';
-import { MonitorIcon, LightbulbIcon, ServerIcon, CodeIcon, PaletteIcon, HelpCircleIcon, ArrowLeftIcon } from './Icons';
+import { LightbulbIcon, ServerIcon, CodeIcon, PaletteIcon, HelpCircleIcon } from './Icons';
 import './MashupResults.css';
 
 interface MashupResultsProps {
@@ -18,6 +18,7 @@ interface MashupResultsProps {
   onRegenerate: () => void;
   onCustomGenerate: (apiIds: string[]) => void;
   onOpenEditor?: () => void;
+  onBack?: () => void;
   isDownloading?: boolean;
   downloadSuccess?: boolean;
 }

@@ -25,3 +25,4 @@ export { BrainstormModal } from './BrainstormModal';
 export { BrainstormChat } from './BrainstormChat';
 export { LandingPage } from './LandingPage';
 export { default as OpenEditorButton } from './OpenEditorButton';
+export { default as LivePreview } from './LivePreview';

@@ -9,6 +9,7 @@ import { getEnvConfig } from '../utils/validateEnv';
  * Base URL for API requests, configured from environment variables
  */
 const API_BASE_URL = getEnvConfig().VITE_API_BASE_URL;
+console.log('API_BASE_URL:', API_BASE_URL);
 
 /**
  * Axios instance with base configuration
@@ -62,8 +63,16 @@ export class APIError extends Error {
  * Handle API errors and convert to APIError
  */
 function handleAPIError(error: unknown): never {
+  console.error('API Error:', error);
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<APIResponse<any>>;
+    console.error('Axios Error Details:', {
+      message: axiosError.message,
+      code: axiosError.code,
+      config: axiosError.config,
+      response: axiosError.response,
+      request: axiosError.request
+    });
     
     if (axiosError.response?.data?.error) {
       const { code, message, details } = axiosError.response.data.error;
@@ -80,7 +89,7 @@ function handleAPIError(error: unknown): never {
     
     if (axiosError.request) {
       throw new APIError(
-        'No response from server. Please check your connection.',
+        `No response from server. Please check your connection. URL: ${axiosError.config?.url}`,
         'NETWORK_ERROR'
       );
     }

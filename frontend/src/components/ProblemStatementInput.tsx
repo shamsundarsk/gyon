@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import './ProblemStatementInput.css';
-import { LightbulbIcon, DiceIcon, SendIcon, SparklesIcon } from './Icons';
+import { LightbulbIcon, SendIcon, SparklesIcon } from './Icons';
 
 interface ProblemStatementInputProps {
   onGenerate: (problemStatement?: string) => void;
   isLoading: boolean;
-  placeholder?: string;
 }
 
-export function ProblemStatementInput({ onGenerate, isLoading, placeholder }: ProblemStatementInputProps) {
+export function ProblemStatementInput({ onGenerate, isLoading }: ProblemStatementInputProps) {
   const [problemStatement, setProblemStatement] = useState('');
   const [mode, setMode] = useState<'problem' | 'random'>('problem');
 

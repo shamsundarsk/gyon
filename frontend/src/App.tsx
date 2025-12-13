@@ -11,11 +11,10 @@ import { GenerationPage } from './components/GenerationPage';
 import { LandingPage } from './components/LandingPage';
 import { BrainstormModal } from './components/BrainstormModal';
 import { BrainstormChat } from './components/BrainstormChat';
-import { OllamaStatus } from './components/OllamaStatus';
-import { ThemeToggle } from './components/ThemeToggle';
+
 import { UserPreferencesPanel } from './components/UserPreferencesPanel';
 import { OnboardingTour, useOnboarding } from './components/OnboardingTour';
-import { DiceIcon, AlertIcon, RobotIcon, BrainIcon, UserIcon, HelpCircleIcon } from './components/Icons';
+import { AlertIcon, RobotIcon, BrainIcon, UserIcon, HelpCircleIcon } from './components/Icons';
 import { useMashup } from './context';
 import { performanceOptimizer } from './services/PerformanceOptimizer';
 import { userPreferencesService } from './services/UserPreferencesService';

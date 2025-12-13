@@ -110,7 +110,6 @@ export const GenerationPage: React.FC<GenerationPageProps> = ({
               <ProblemStatementInput 
                 onGenerate={handleProblemGenerate} 
                 isLoading={isLoading}
-                placeholder="e.g., I want to build a fitness tracking app that uses music to motivate users..."
               />
             </div>
           </div>

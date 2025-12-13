@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BrainIcon, XIcon, ClipboardIcon, SendIcon, RobotIcon, UserIcon, ServerIcon, RefreshIcon } from './Icons';
+import { BrainIcon, XIcon, ClipboardIcon, SendIcon, RobotIcon, ServerIcon, RefreshIcon } from './Icons';
 
 interface Message {
   id: string;

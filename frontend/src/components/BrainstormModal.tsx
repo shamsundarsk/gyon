@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrainIcon, RocketIcon, LinkIcon, XIcon, ShareIcon, SparklesIcon, RefreshIcon, LockIcon, UsersIcon, LightbulbIcon, CompassIcon, ServerIcon } from './Icons';
+import { BrainIcon, RocketIcon, LinkIcon, XIcon, SparklesIcon, RefreshIcon, LockIcon, UsersIcon, LightbulbIcon, CompassIcon, ServerIcon } from './Icons';
 
 interface BrainstormModalProps {
   isOpen: boolean;
