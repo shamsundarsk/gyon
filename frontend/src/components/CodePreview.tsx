@@ -11,14 +11,14 @@ const CodePreview: React.FC<CodePreviewProps> = ({ codePreview }) => {
   const [activeTab, setActiveTab] = useState<'structure' | 'backend' | 'frontend'>('structure');
 
   const renderFileStructure = (structure: FileStructure, level: number = 0): React.ReactNode => {
-    const indent = level * 24;
+    const indent = level * 32;
     const isDirectory = structure.type === 'directory';
 
     return (
-      <div key={structure.name} style={{ marginLeft: `${indent}px` }}>
+      <div key={structure.name} style={{ marginLeft: `${indent}px`, width: '100%' }}>
         <div className="structure-item">
           <span className="structure-icon">
-            {isDirectory ? <FolderIcon size={16} color="#2ecc70" /> : <FileIcon size={16} color="#718096" />}
+            {isDirectory ? <FolderIcon size={18} color="#2ecc70" /> : <FileIcon size={18} color="#718096" />}
           </span>
           <span className="structure-name">{structure.name}</span>
         </div>
@@ -59,7 +59,9 @@ const CodePreview: React.FC<CodePreviewProps> = ({ codePreview }) => {
         {activeTab === 'structure' && (
           <div className="tab-panel">
             <div className="file-structure">
-              {renderFileStructure(codePreview.structure)}
+              <div style={{ width: '100%', minHeight: '400px' }}>
+                {renderFileStructure(codePreview.structure)}
+              </div>
             </div>
           </div>
         )}

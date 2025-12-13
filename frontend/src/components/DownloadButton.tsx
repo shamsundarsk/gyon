@@ -1,4 +1,5 @@
 import React from 'react';
+import { DownloadIcon, CheckIcon } from './Icons';
 import './DownloadButton.css';
 
 interface DownloadButtonProps {
@@ -18,7 +19,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     if (isDownloading) {
       return (
         <>
-          <span className="button-icon spinner">⟳</span>
+          <div className="loading-spinner-btn" />
           Downloading...
         </>
       );
@@ -27,7 +28,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     if (downloadSuccess) {
       return (
         <>
-          <span className="button-icon">✓</span>
+          <CheckIcon size={20} />
           Downloaded!
         </>
       );
@@ -35,7 +36,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     
     return (
       <>
-        <span className="button-icon">⬇</span>
+        <DownloadIcon size={20} />
         Download Project
       </>
     );
